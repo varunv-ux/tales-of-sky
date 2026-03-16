@@ -13,7 +13,7 @@ function formatDuration(minutes) {
 
 // --- Creative Content ---
 
-const weatherHaikus = {
+export const weatherHaikus = {
   Clear: [
     'Sun spills gold like wine\nnot a cloud dares to speak up\nthe sky chose today',
     'Blue from edge to edge\nthe horizon holds its breath\nlight pours endlessly',
@@ -191,19 +191,10 @@ export default function WeatherInsights({ weatherData, forecastData, unit, toTem
     // Build items
     const items = [];
 
-    // Haiku
-    const haiku = pick(weatherHaikus[condition] || weatherHaikus['Clear']);
-    if (haiku) items.push({ label: 'Haiku', text: haiku, type: 'haiku' });
-
-    // Dear Sky
-    const letters = dearSkyLetters[condition] || dearSkyLetters['Clear'];
-    const letter = pick(letters);
-    if (letter) items.push({ label: 'Dear Sky', text: letter.replace('{city}', cityName), type: 'letter' });
-
     // Mood
     const moodKey = getMoodKey(condition, tempC);
     const mood = moodOutfits[moodKey];
-    if (mood) items.push({ label: 'Mood', text: mood, type: 'mood' });
+    if (mood) items.push({ label: 'Mood', text: mood });
 
     // Daylight
     let daylightText;
@@ -237,23 +228,11 @@ export default function WeatherInsights({ weatherData, forecastData, unit, toTem
         {data.map((item) => (
           <div
             key={item.label}
-            className={`bg-taupe-100 dark:bg-taupe-800 rounded-2xl px-5 py-5 ${
-              item.type === 'haiku' ? 'col-span-2' : ''
-            }`}
+            className="bg-taupe-100 dark:bg-taupe-800 rounded-2xl px-5 py-5"
           >
-            {item.type === 'haiku' ? (
-              <p className="text-[1.25rem] leading-[1.6] tracking-[0.02em] text-taupe-700 dark:text-taupe-300 whitespace-pre-line italic">
-                {item.text}
-              </p>
-            ) : item.type === 'letter' ? (
-              <p className="text-[1.25rem] leading-[1.3] tracking-[0.02em] text-taupe-700 dark:text-taupe-300 italic">
-                {item.text}
-              </p>
-            ) : (
-              <p className="text-[1.25rem] leading-[1.3] tracking-[0.02em] text-taupe-700 dark:text-taupe-300">
-                {item.text}
-              </p>
-            )}
+            <p className="text-[1.25rem] leading-[1.3] tracking-[0.02em] text-taupe-700 dark:text-taupe-300">
+              {item.text}
+            </p>
           </div>
         ))}
       </div>

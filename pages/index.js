@@ -5,9 +5,7 @@ import WeatherCard from '../components/WeatherCard';
 import ConditionsPanel from '../components/ConditionsPanel';
 import HourlyForecast from '../components/HourlyForecast';
 import DailyForecast from '../components/DailyForecast';
-import WeatherInsights from '../components/WeatherInsights';
-import SkyScore from '../components/SkyScore';
-import SkyPalette from '../components/SkyPalette';
+import WeatherInsights, { weatherHaikus } from '../components/WeatherInsights';
 import ShareCard from '../components/ShareCard';
 import ErrorBoundary from '../components/ErrorBoundary';
 import { WeatherSkeleton } from '../components/Skeleton';
@@ -131,6 +129,7 @@ export default function Home() {
   const [suggestions, setSuggestions] = useState([]);
   const [darkMode, setDarkMode] = useState(false);
   const debounceRef = useRef(null);
+  const shareCardRef = useRef(null);
 
   // Persist and restore dark mode preference + detect system preference
   useEffect(() => {
@@ -282,6 +281,11 @@ export default function Home() {
     return lines ? lines[Math.floor(Math.random() * lines.length)] : 'Weather is undecided.';
   }, [weatherCondition]);
 
+  const haiku = useMemo(() => {
+    const lines = weatherHaikus[weatherCondition] || weatherHaikus['Clear'];
+    return lines ? lines[Math.floor(Math.random() * lines.length)] : null;
+  }, [weatherCondition]);
+
   // Debounced city autosuggest via OpenWeatherMap Geocoding API
   useEffect(() => {
     if (debounceRef.current) clearTimeout(debounceRef.current);
@@ -364,6 +368,16 @@ export default function Home() {
 
         <main className="flex-1 m-1.5 px-5 sm:px-10 pt-16 md:pt-12 pb-12 bg-taupe-50 dark:bg-taupe-900 overflow-y-auto max-h-[calc(100vh-12px)] rounded-[2rem] relative">
           <div className="absolute top-4 right-5 flex items-center space-x-2 z-10">
+            {/* Share button */}
+            <button
+              onClick={() => shareCardRef.current?.download()}
+              aria-label="Download share card"
+              className="p-1.5 rounded-full border border-taupe-200 dark:border-taupe-700 text-taupe-400 dark:text-taupe-500 bg-white dark:bg-taupe-800 hover:bg-taupe-100 dark:hover:bg-taupe-700 transition-colors"
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" /><polyline points="16 6 12 2 8 6" /><line x1="12" y1="2" x2="12" y2="15" />
+              </svg>
+            </button>
             {/* Refresh button */}
             <button
               onClick={handleRefresh}
@@ -407,6 +421,9 @@ export default function Home() {
             </div>
           </div>
 
+          {/* Hidden share card canvas */}
+          <ShareCard ref={shareCardRef} weatherData={weatherData} unit={unit} toTemp={toTemp} funnyLine={funnyLine} />
+
           {/* Weather alerts banner */}
           {alerts.length > 0 && (
             <div className="mb-4 max-w-[42rem] mx-auto">
@@ -435,13 +452,19 @@ export default function Home() {
                   setUnit={handleSetUnit}
                   toTemp={toTemp}
                 />
-                <SkyScore weatherData={weatherData} unit={unit} toTemp={toTemp} />
-                <SkyPalette weatherData={weatherData} />
                 <ConditionsPanel weatherData={weatherData} unit={unit} toTemp={toTemp} />
                 <WeatherInsights weatherData={weatherData} forecastData={forecastData} unit={unit} toTemp={toTemp} />
                 <HourlyForecast forecastData={forecastData} unit={unit} toTemp={toTemp} />
                 <DailyForecast forecastData={forecastData} unit={unit} toTemp={toTemp} />
-                <ShareCard weatherData={weatherData} unit={unit} toTemp={toTemp} funnyLine={funnyLine} />
+
+                {/* Haiku footer */}
+                {haiku && (
+                  <div className="mt-12 mb-4 text-center">
+                    <p className="text-[1.1rem] leading-[1.7] tracking-[0.02em] text-taupe-400 dark:text-taupe-500 whitespace-pre-line italic">
+                      {haiku}
+                    </p>
+                  </div>
+                )}
               </>
             )}
             </ErrorBoundary>
