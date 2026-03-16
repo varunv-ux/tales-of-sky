@@ -18,12 +18,40 @@
   scrollbar-width: none;
 }
 
-/* Hide page-level scrollbar — only the content panel scrolls */
+/* Hide page-level scrollbar — only the content panel scrolls (default layout only) */
 html,
 body,
 #__next {
   height: 100%;
+}
+
+/* Default layout: body doesn't scroll, main does */
+body.layout-default {
   overflow: hidden;
+}
+
+/* Variant layouts: body scrolls naturally */
+body.layout-variant {
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(120, 113, 108, 0.15) transparent;
+}
+
+body.layout-variant::-webkit-scrollbar {
+  width: 5px;
+}
+
+body.layout-variant::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+body.layout-variant::-webkit-scrollbar-thumb {
+  background: rgba(120, 113, 108, 0.15);
+  border-radius: 3px;
+}
+
+body.layout-variant::-webkit-scrollbar-thumb:hover {
+  background: rgba(120, 113, 108, 0.25);
 }
 
 /* Minimal native-feeling scrollbar for the content panel */
@@ -54,4 +82,66 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
+}
+
+/* =============================================
+   DESIGN VARIANT STYLES
+   ============================================= */
+
+/* --- Aurora Variant: Floating orb animation --- */
+@keyframes aurora-drift {
+  0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.6; }
+  25% { transform: translate(30px, -20px) scale(1.05); opacity: 0.8; }
+  50% { transform: translate(-20px, 15px) scale(0.95); opacity: 0.5; }
+  75% { transform: translate(15px, 25px) scale(1.08); opacity: 0.7; }
+}
+
+.aurora-orb {
+  animation: aurora-drift 12s ease-in-out infinite;
+}
+
+/* --- Glass Variant: Frosted glass card --- */
+.glass-card {
+  background: rgba(255, 255, 255, 0.08);
+  -webkit-backdrop-filter: blur(20px) saturate(1.5);
+  backdrop-filter: blur(20px) saturate(1.5);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+/* --- Sensorial Variant: Organic blob animations --- */
+@keyframes blob-drift-1 {
+  0%, 100% { transform: translate(0, 0) scale(1) rotate(0deg); }
+  33% { transform: translate(40px, -30px) scale(1.1) rotate(5deg); }
+  66% { transform: translate(-20px, 20px) scale(0.95) rotate(-3deg); }
+}
+
+@keyframes blob-drift-2 {
+  0%, 100% { transform: translate(0, 0) scale(1) rotate(0deg); }
+  33% { transform: translate(-30px, 40px) scale(0.9) rotate(-5deg); }
+  66% { transform: translate(35px, -15px) scale(1.05) rotate(3deg); }
+}
+
+@keyframes blob-drift-3 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(-25px, 30px) scale(1.08); }
+}
+
+.sensorial-blob-1 { animation: blob-drift-1 20s ease-in-out infinite; }
+.sensorial-blob-2 { animation: blob-drift-2 25s ease-in-out infinite; }
+.sensorial-blob-3 { animation: blob-drift-3 18s ease-in-out infinite; }
+
+/* Sensorial sphere — slow rotation with shimmer */
+@keyframes sphere-rotate {
+  0% { transform: rotate(0deg) scale(1); }
+  50% { transform: rotate(180deg) scale(1.05); }
+  100% { transform: rotate(360deg) scale(1); }
+}
+
+.sensorial-sphere {
+  animation: sphere-rotate 15s linear infinite;
+  box-shadow:
+    0 0 60px rgba(255, 255, 255, 0.15),
+    inset 0 0 30px rgba(255, 255, 255, 0.1);
 }

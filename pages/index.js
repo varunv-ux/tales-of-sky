@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Head from 'next/head';
+import Link from 'next/link';
 import Sidebar from '../components/Sidebar';
 import WeatherCard from '../components/WeatherCard';
 import ConditionsPanel from '../components/ConditionsPanel';
@@ -130,6 +131,13 @@ export default function Home() {
   const [darkMode, setDarkMode] = useState(false);
   const debounceRef = useRef(null);
   const shareCardRef = useRef(null);
+
+  // Set body layout class
+  useEffect(() => {
+    document.body.classList.add('layout-default');
+    document.body.classList.remove('layout-variant');
+    return () => document.body.classList.remove('layout-default');
+  }, []);
 
   // Persist and restore dark mode preference + detect system preference
   useEffect(() => {
@@ -369,6 +377,18 @@ export default function Home() {
 
         <main className="flex-1 m-1.5 px-5 sm:px-10 pt-16 md:pt-12 pb-12 bg-taupe-50 dark:bg-taupe-900 overflow-y-auto max-h-[calc(100vh-12px)] rounded-[2rem] relative">
           <div className="absolute top-4 right-5 flex items-center space-x-2 z-10">
+            {/* Variant links */}
+            <div className="hidden md:flex items-center gap-1 mr-2">
+              <Link href="/aurora" className="px-2.5 py-1 rounded-full text-[0.7rem] font-medium text-taupe-400 hover:text-taupe-600 dark:text-taupe-500 dark:hover:text-taupe-300 hover:bg-taupe-100 dark:hover:bg-taupe-800 transition-colors">
+                Aurora
+              </Link>
+              <Link href="/glass" className="px-2.5 py-1 rounded-full text-[0.7rem] font-medium text-taupe-400 hover:text-taupe-600 dark:text-taupe-500 dark:hover:text-taupe-300 hover:bg-taupe-100 dark:hover:bg-taupe-800 transition-colors">
+                Glass
+              </Link>
+              <Link href="/sensorial" className="px-2.5 py-1 rounded-full text-[0.7rem] font-medium text-taupe-400 hover:text-taupe-600 dark:text-taupe-500 dark:hover:text-taupe-300 hover:bg-taupe-100 dark:hover:bg-taupe-800 transition-colors">
+                Sensorial
+              </Link>
+            </div>
             {/* Share button */}
             <button
               onClick={() => shareCardRef.current?.download()}
