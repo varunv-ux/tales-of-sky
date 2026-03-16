@@ -2,17 +2,17 @@ import { useMemo } from 'react';
 
 // Generate a 5-color sky palette based on time of day + weather condition
 const palettes = {
-  'clear-day': ['#87CEEB', '#5DADE2', '#F4D03F', '#F5B041', '#E8DAEF'],
+  'clear-day': ['#87CEEB', '#A8D8EA', '#F4D03F', '#F5CBA7', '#E8DAEF'],
   'clear-dawn': ['#FDEBD0', '#F5B7B1', '#D2B4DE', '#AED6F1', '#85C1E9'],
-  'clear-dusk': ['#F1948A', '#E74C3C', '#AF7AC5', '#5B2C6F', '#1B2631'],
+  'clear-dusk': ['#F1948A', '#E8A87C', '#D4A5C8', '#A778B4', '#6C5B7B'],
   'clear-night': ['#1B2631', '#212F3D', '#2E4053', '#34495E', '#5D6D7E'],
-  'cloudy-day': ['#D5D8DC', '#AEB6BF', '#85929E', '#ABB2B9', '#BFC9CA'],
+  'cloudy-day': ['#C8D6E5', '#B8C6D6', '#A4B0BD', '#CCD1D9', '#DFE4EA'],
   'cloudy-night': ['#2C3E50', '#34495E', '#5D6D7E', '#7F8C8D', '#95A5A6'],
-  'rain-day': ['#5D6D7E', '#2E4053', '#1B4F72', '#2471A3', '#85929E'],
+  'rain-day': ['#A8C6DF', '#7FB3D8', '#6DA4C8', '#8BAFC4', '#B0C4DE'],
   'rain-night': ['#1B2631', '#1B4F72', '#154360', '#1A5276', '#2C3E50'],
-  'snow-day': ['#F2F4F4', '#D5DBDB', '#AEB6BF', '#E8F8F5', '#D1F2EB'],
+  'snow-day': ['#F2F4F4', '#D5DBDB', '#C8E6F0', '#E8F8F5', '#D1F2EB'],
   'snow-night': ['#2C3E50', '#AEB6BF', '#D5D8DC', '#85929E', '#5D6D7E'],
-  'storm-day': ['#4A235A', '#6C3483', '#2C3E50', '#1C2833', '#566573'],
+  'storm-day': ['#8E7CC3', '#A48AD4', '#7C8EB0', '#9CAAB8', '#B0A0C8'],
   'storm-night': ['#1B2631', '#4A235A', '#1C2833', '#2E4053', '#512E5F'],
   'mist': ['#D5D8DC', '#E5E7E9', '#F2F3F4', '#CACFD2', '#BDC3C7'],
 };

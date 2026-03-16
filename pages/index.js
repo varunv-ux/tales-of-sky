@@ -1,6 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Head from 'next/head';
-import Link from 'next/link';
 import Sidebar from '../components/Sidebar';
 import WeatherCard from '../components/WeatherCard';
 import ConditionsPanel from '../components/ConditionsPanel';
@@ -10,6 +9,10 @@ import WeatherInsights, { weatherHaikus } from '../components/WeatherInsights';
 import ShareCard from '../components/ShareCard';
 import ErrorBoundary from '../components/ErrorBoundary';
 import { WeatherSkeleton } from '../components/Skeleton';
+import { getSkyPalette } from '../components/SkyPalette';
+import AuroraTheme from '../components/AuroraTheme';
+import GlassTheme from '../components/GlassTheme';
+import SensorialTheme from '../components/SensorialTheme';
 
 const API_KEY = '07aa3d7c5e90fe9b7f274297ee14f5c1';
 const DEFAULT_CITY = 'New York';
@@ -129,14 +132,36 @@ export default function Home() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [suggestions, setSuggestions] = useState([]);
   const [darkMode, setDarkMode] = useState(false);
+  const [theme, setTheme] = useState('default');
   const debounceRef = useRef(null);
   const shareCardRef = useRef(null);
 
-  // Set body layout class
+  // Set body layout class based on theme
   useEffect(() => {
-    document.body.classList.add('layout-default');
-    document.body.classList.remove('layout-variant');
-    return () => document.body.classList.remove('layout-default');
+    if (theme === 'default') {
+      document.body.classList.add('layout-default');
+      document.body.classList.remove('layout-variant');
+    } else {
+      document.body.classList.add('layout-variant');
+      document.body.classList.remove('layout-default');
+    }
+    return () => {
+      document.body.classList.remove('layout-default');
+      document.body.classList.remove('layout-variant');
+    };
+  }, [theme]);
+
+  // Persist and restore theme preference
+  useEffect(() => {
+    const storedTheme = window.localStorage.getItem('tales-of-sky-theme');
+    if (['default', 'aurora', 'glass', 'sensorial'].includes(storedTheme)) {
+      setTheme(storedTheme);
+    }
+  }, []);
+
+  const handleSetTheme = useCallback((t) => {
+    setTheme(t);
+    window.localStorage.setItem('tales-of-sky-theme', t);
   }, []);
 
   // Persist and restore dark mode preference + detect system preference
@@ -335,6 +360,80 @@ export default function Home() {
 
   const displayCities = cityList.length ? cityList : [location];
 
+  // Computed data for themed layouts
+  const palette = useMemo(() => {
+    if (!weatherData) return ['#E8E5E3', '#D6D2CF', '#ACA7A2', '#827A74', '#564F4D'];
+    return getSkyPalette(weatherCondition, weatherData.timezone);
+  }, [weatherData, weatherCondition]);
+
+  const hourlyData = useMemo(() => {
+    if (!forecastData?.list) return [];
+    return forecastData.list.slice(0, 8);
+  }, [forecastData]);
+
+  const dailyForecast = useMemo(() => {
+    if (!forecastData?.list) return [];
+    const daily = {};
+    forecastData.list.forEach((item) => {
+      const date = new Date(item.dt * 1000).toDateString();
+      if (!daily[date]) {
+        daily[date] = { date, min: item.main.temp_min, max: item.main.temp_max, icon: item.weather[0].icon, condition: item.weather[0].main };
+      } else {
+        daily[date].min = Math.min(daily[date].min, item.main.temp_min);
+        daily[date].max = Math.max(daily[date].max, item.main.temp_max);
+      }
+    });
+    return Object.values(daily).slice(0, 5);
+  }, [forecastData]);
+
+  // Theme picker component — passed into themed layouts
+  const themes = [
+    { id: 'default', label: 'Classic' },
+    { id: 'aurora', label: 'Aurora' },
+    { id: 'glass', label: 'Glass' },
+    { id: 'sensorial', label: 'Sensorial' },
+  ];
+
+  const ThemePicker = useCallback(() => (
+    <div className="flex items-center gap-1 bg-white/40 backdrop-blur-md rounded-full p-1 border border-stone-200/40 shadow-sm">
+      {themes.map((t) => (
+        <button
+          key={t.id}
+          onClick={() => handleSetTheme(t.id)}
+          className={`px-3 py-1.5 rounded-full text-[0.7rem] font-semibold transition-all ${
+            theme === t.id
+              ? 'bg-stone-800 text-white shadow-sm'
+              : 'text-stone-500 hover:text-stone-700 hover:bg-white/50'
+          }`}
+        >
+          {t.label}
+        </button>
+      ))}
+    </div>
+  ), [theme, handleSetTheme]);
+
+  // Shared props for themed layouts
+  const themeProps = {
+    location, unit, weatherData, forecastData, isLoading, weatherCondition,
+    handleSetUnit, toTemp, handleRefresh, funnyLine, haiku,
+    hourlyData, dailyForecast, palette, ThemePicker,
+  };
+
+  // Render themed layout if not default
+  if (theme !== 'default' && !isLoading) {
+    const ThemeComponent = theme === 'aurora' ? AuroraTheme : theme === 'glass' ? GlassTheme : SensorialTheme;
+    return (
+      <>
+        <Head>
+          <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+          <title>{`Tales of Sky — ${location}`}</title>
+          <meta name="viewport" content="width=device-width, initial-scale=1" />
+        </Head>
+        <ThemeComponent {...themeProps} />
+      </>
+    );
+  }
+
   return (
     <>
       <Head>
@@ -377,17 +476,9 @@ export default function Home() {
 
         <main className="flex-1 m-1.5 px-5 sm:px-10 pt-16 md:pt-12 pb-12 bg-taupe-50 dark:bg-taupe-900 overflow-y-auto max-h-[calc(100vh-12px)] rounded-[2rem] relative">
           <div className="absolute top-4 right-5 flex items-center space-x-2 z-10">
-            {/* Variant links */}
-            <div className="hidden md:flex items-center gap-1 mr-2">
-              <Link href="/aurora" className="px-2.5 py-1 rounded-full text-[0.7rem] font-medium text-taupe-400 hover:text-taupe-600 dark:text-taupe-500 dark:hover:text-taupe-300 hover:bg-taupe-100 dark:hover:bg-taupe-800 transition-colors">
-                Aurora
-              </Link>
-              <Link href="/glass" className="px-2.5 py-1 rounded-full text-[0.7rem] font-medium text-taupe-400 hover:text-taupe-600 dark:text-taupe-500 dark:hover:text-taupe-300 hover:bg-taupe-100 dark:hover:bg-taupe-800 transition-colors">
-                Glass
-              </Link>
-              <Link href="/sensorial" className="px-2.5 py-1 rounded-full text-[0.7rem] font-medium text-taupe-400 hover:text-taupe-600 dark:text-taupe-500 dark:hover:text-taupe-300 hover:bg-taupe-100 dark:hover:bg-taupe-800 transition-colors">
-                Sensorial
-              </Link>
+            {/* Theme picker */}
+            <div className="hidden md:block mr-2">
+              <ThemePicker />
             </div>
             {/* Share button */}
             <button
