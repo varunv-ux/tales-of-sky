@@ -163,7 +163,7 @@ export default function Home() {
       try {
         const parsedCities = JSON.parse(storedCities);
         if (Array.isArray(parsedCities) && parsedCities.length) {
-          setCityList(normalizeCityList(parsedCities).slice(0, 6));
+          setCityList(normalizeCityList(parsedCities));
         }
       } catch (storageError) {
         console.error('Failed to read saved cities', storageError);
@@ -213,11 +213,11 @@ export default function Home() {
       const exists = baseCities.some((city) => city.toLowerCase() === cityName.toLowerCase());
 
       if (!isSearch && exists) {
-        return normalizeCityList(baseCities).slice(0, 6);
+        return normalizeCityList(baseCities);
       }
 
       const filtered = baseCities.filter((city) => city.toLowerCase() !== cityName.toLowerCase());
-      return normalizeCityList([cityName, ...filtered]).slice(0, 6);
+      return normalizeCityList([cityName, ...filtered]);
     });
   };
 
@@ -250,6 +250,7 @@ export default function Home() {
 
       if (Number(data.cod) !== 200) {
         setError('City not found');
+        setIsLoading(false);
         return;
       }
 
@@ -330,7 +331,7 @@ export default function Home() {
     <>
       <Head>
         <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-        <title>Tales of Sky — {location}</title>
+        <title>{`Tales of Sky — ${location}`}</title>
         <meta name="description" content={`Weather for ${location}. ${weatherData ? `${Math.round(weatherData.main.temp)}°C, ${weatherData.weather?.[0]?.description}` : 'Beautifully told weather.'}`} />
         <meta property="og:title" content={`Tales of Sky — ${location}`} />
         <meta property="og:description" content={`Weather for ${location}, beautifully told.`} />
@@ -340,7 +341,7 @@ export default function Home() {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </Head>
 
-      <div className="flex min-h-screen font-sans text-taupe-800 dark:text-taupe-200 bg-taupe-200 dark:bg-taupe-950 antialiased">
+      <div className="flex h-screen font-sans text-taupe-800 dark:text-taupe-200 bg-taupe-200 dark:bg-taupe-950 antialiased">
         {/* Mobile header */}
         <div className="fixed top-0 left-0 right-0 z-20 flex items-center px-5 py-3 bg-taupe-200 dark:bg-taupe-950 border-b border-taupe-300 dark:border-taupe-800 md:hidden">
           <button onClick={() => setSidebarOpen(true)} aria-label="Open menu" className="p-1 mr-3 text-taupe-400">
@@ -460,7 +461,7 @@ export default function Home() {
                 {/* Haiku footer */}
                 {haiku && (
                   <div className="mt-12 mb-4 text-center">
-                    <p className="text-[1.1rem] leading-[1.7] tracking-[0.02em] text-taupe-400 dark:text-taupe-500 whitespace-pre-line italic">
+                    <p className="text-[1.35rem] leading-[1.8] tracking-[0.01em] text-taupe-400 dark:text-taupe-500 whitespace-pre-line italic" style={{ fontFamily: "'Instrument Serif', Georgia, serif" }}>
                       {haiku}
                     </p>
                   </div>
