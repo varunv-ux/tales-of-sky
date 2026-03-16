@@ -30,7 +30,7 @@ export default function WeatherCard({ location, weatherData, isLoading, funnyLin
         {isLoading ? 'Checking the sky...' : funnyLine}
       </p>
 
-      <div className="relative w-full h-[250px] rounded-2xl overflow-hidden shadow-sm">
+      <div className="relative w-full h-[250px] rounded-[1.5rem] overflow-hidden shadow-sm">
         <Image
           src={imgSrc}
           alt={location}
@@ -39,21 +39,6 @@ export default function WeatherCard({ location, weatherData, isLoading, funnyLin
           onError={() => setImgSrc('/ghibli/default.jpg')}
           priority
         />
-      </div>
-
-      <div className="flex justify-center space-x-2 mt-4">
-        {['C', 'F'].map((u) => (
-          <button
-            key={u}
-            onClick={() => setUnit(u)}
-            aria-label={`Switch to ${u === 'C' ? 'Celsius' : 'Fahrenheit'}`}
-            className={`px-5 py-2 rounded-[999px] border text-[0.98rem] font-semibold tracking-[-0.02em] ${
-              unit === u ? 'bg-taupe-800 text-white border-taupe-800' : 'border-taupe-200 text-taupe-600 bg-white'
-            }`}
-          >
-            °{u}
-          </button>
-        ))}
       </div>
     </>
   );

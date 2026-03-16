@@ -5,6 +5,7 @@ import WeatherCard from '../components/WeatherCard';
 import ConditionsPanel from '../components/ConditionsPanel';
 import HourlyForecast from '../components/HourlyForecast';
 import DailyForecast from '../components/DailyForecast';
+import WeatherInsights from '../components/WeatherInsights';
 import { WeatherSkeleton } from '../components/Skeleton';
 
 const API_KEY = '07aa3d7c5e90fe9b7f274297ee14f5c1';
@@ -272,7 +273,21 @@ export default function Home() {
           onSuggestionClick={handleSuggestionClick}
         />
 
-        <main className="flex-1 m-1.5 px-5 sm:px-10 pt-16 md:pt-12 pb-12 bg-taupe-50 overflow-y-auto max-h-[calc(100vh-12px)] rounded-[2rem]">
+        <main className="flex-1 m-1.5 px-5 sm:px-10 pt-16 md:pt-12 pb-12 bg-taupe-50 overflow-y-auto max-h-[calc(100vh-12px)] rounded-[2rem] relative">
+          <div className="absolute top-4 right-5 flex space-x-1.5 z-10">
+            {['C', 'F'].map((u) => (
+              <button
+                key={u}
+                onClick={() => setUnit(u)}
+                aria-label={`Switch to ${u === 'C' ? 'Celsius' : 'Fahrenheit'}`}
+                className={`px-3 py-1 rounded-[999px] border text-[0.75rem] font-semibold tracking-[-0.02em] ${
+                  unit === u ? 'bg-taupe-800 text-white border-taupe-800' : 'border-taupe-200 text-taupe-500 bg-white'
+                }`}
+              >
+                °{u}
+              </button>
+            ))}
+          </div>
           <div className="max-w-[42rem] mx-auto space-y-5 text-center">
             {isLoading && !weatherData ? (
               <WeatherSkeleton />
@@ -288,6 +303,7 @@ export default function Home() {
                   toTemp={toTemp}
                 />
                 <ConditionsPanel weatherData={weatherData} unit={unit} toTemp={toTemp} />
+                <WeatherInsights weatherData={weatherData} forecastData={forecastData} unit={unit} toTemp={toTemp} />
                 <HourlyForecast forecastData={forecastData} unit={unit} toTemp={toTemp} />
                 <DailyForecast forecastData={forecastData} unit={unit} toTemp={toTemp} />
               </>

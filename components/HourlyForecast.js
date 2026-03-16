@@ -22,6 +22,11 @@ export default function HourlyForecast({ forecastData, unit, toTemp }) {
             <div className="text-[0.75rem] text-taupe-400 mt-0.5">
               {hour.weather[0].main}
             </div>
+            {hour.pop > 0.1 && (
+              <div className="text-[0.72rem] font-medium text-blue-500 mt-0.5">
+                {Math.round(hour.pop * 100)}%
+              </div>
+            )}
           </div>
         ))}
       </div>
