@@ -86,8 +86,8 @@ export default function SensorialTheme({
         <div className="grid grid-cols-2 gap-3">
           {/* Condition */}
           <BentoCard className="flex flex-col justify-between min-h-[180px]">
-            <p className="text-xs text-stone-400 tracking-wide">Condition</p>
-            <p className="text-[2.5rem] leading-none font-bold tracking-[-0.04em] text-stone-800 capitalize">
+            <p className="text-xs text-stone-500 tracking-wide">Condition</p>
+            <p className="text-[2.5rem] leading-none font-bold tracking-[-0.04em] text-stone-900 capitalize">
               {weatherData?.weather?.[0]?.main || 'Clear'}
             </p>
           </BentoCard>
@@ -102,7 +102,7 @@ export default function SensorialTheme({
 
           {/* Tags */}
           <BentoCard className="min-h-[140px]">
-            <p className="text-xs text-stone-400 tracking-wide mb-3">How it feels</p>
+            <p className="text-xs text-stone-500 tracking-wide mb-3">How it feels</p>
             <div className="flex flex-wrap gap-2">
               {tags.map((tag, i) => (
                 <span key={tag}
@@ -115,19 +115,19 @@ export default function SensorialTheme({
 
           {/* Feeling */}
           <BentoCard className="flex flex-col justify-center min-h-[140px]">
-            <p className="text-[1.65rem] leading-tight font-semibold tracking-[-0.03em] text-stone-700">{mood.feeling}</p>
+            <p className="text-[1.65rem] leading-tight font-semibold tracking-[-0.03em] text-stone-800">{mood.feeling}</p>
           </BentoCard>
 
           {/* Temperature */}
           <BentoCard span className="text-center py-8">
             <div className="flex items-center justify-center gap-3 mb-3">
               {weatherData?.weather?.[0]?.icon && <WeatherIcon iconCode={weatherData.weather[0].icon} size={64} />}
-              <span className="text-[5.5rem] leading-none font-bold tracking-[-0.06em] text-stone-800">
+              <span className="text-[5.5rem] leading-none font-bold tracking-[-0.06em] text-stone-900">
                 {weatherData ? toTemp(weatherData.main.temp) : '--'}°
               </span>
             </div>
-            <p className="text-stone-500 text-base">{location}</p>
-            <p className="text-stone-400 text-sm italic mt-1">{funnyLine}</p>
+            <p className="text-stone-600 text-base font-medium">{location}</p>
+            <p className="text-stone-500 text-sm italic mt-1">{funnyLine}</p>
             <div className="flex justify-center gap-2 mt-4">
               {['C', 'F'].map((u) => (
                 <button key={u} onClick={() => handleSetUnit(u)}
@@ -146,43 +146,43 @@ export default function SensorialTheme({
           {weatherData && (
             <>
               <BentoCard>
-                <p className="text-xs text-stone-400 mb-1">Feels Like</p>
-                <p className="text-2xl font-bold text-stone-800 tabular-nums">{toTemp(weatherData.main.feels_like)}°</p>
+                <p className="text-xs text-stone-500 mb-1">Feels Like</p>
+                <p className="text-2xl font-bold text-stone-900 tabular-nums">{toTemp(weatherData.main.feels_like)}°</p>
               </BentoCard>
               <BentoCard>
-                <p className="text-xs text-stone-400 mb-1">Humidity</p>
-                <p className="text-2xl font-bold text-stone-800 tabular-nums">{weatherData.main.humidity}%</p>
+                <p className="text-xs text-stone-500 mb-1">Humidity</p>
+                <p className="text-2xl font-bold text-stone-900 tabular-nums">{weatherData.main.humidity}%</p>
               </BentoCard>
               <BentoCard>
-                <p className="text-xs text-stone-400 mb-1">Wind</p>
-                <p className="text-2xl font-bold text-stone-800 tabular-nums">
+                <p className="text-xs text-stone-500 mb-1">Wind</p>
+                <p className="text-2xl font-bold text-stone-900 tabular-nums">
                   {unit === 'C' ? `${(weatherData.wind.speed * 3.6).toFixed(0)}` : `${(weatherData.wind.speed * 2.237).toFixed(0)}`}
-                  <span className="text-sm font-medium text-stone-400 ml-1">{unit === 'C' ? 'km/h' : 'mph'}</span>
+                  <span className="text-sm font-medium text-stone-500 ml-1">{unit === 'C' ? 'km/h' : 'mph'}</span>
                 </p>
               </BentoCard>
               <BentoCard>
-                <p className="text-xs text-stone-400 mb-1">Daylight</p>
-                <p className="text-lg font-bold text-stone-800">{sunrise}</p>
-                <p className="text-xs text-stone-400 mt-0.5">→ {sunset}</p>
+                <p className="text-xs text-stone-500 mb-1">Daylight</p>
+                <p className="text-lg font-bold text-stone-900">{sunrise}</p>
+                <p className="text-xs text-stone-500 mt-0.5">→ {sunset}</p>
               </BentoCard>
             </>
           )}
 
           {/* Insights — full width */}
-          <div className="col-span-2 [&_h3]:text-stone-700 [&_p]:text-stone-600 [&>div]:mt-0">
+          <div className="col-span-2 [&_h3]:text-stone-800 [&_p]:text-stone-700 [&>div]:mt-0">
             <WeatherInsights weatherData={weatherData} forecastData={forecastData} unit={unit} toTemp={toTemp}
               cardClassName="bg-white/60 backdrop-blur-sm border border-stone-200/60" />
           </div>
 
           {/* Palette */}
           <BentoCard span className="overflow-hidden">
-            <p className="text-xs text-stone-400 tracking-wide mb-3">Sky Palette</p>
+            <p className="text-xs text-stone-500 tracking-wide mb-3">Sky Palette</p>
             <div className="h-16 rounded-2xl mb-3" style={{ background: `linear-gradient(135deg, ${palette.join(', ')})` }} />
             <div className="flex justify-between">
               {palette.map((c, i) => (
                 <div key={i} className="flex flex-col items-center">
                   <div className="w-6 h-6 rounded-full border-2 border-white shadow-sm" style={{ backgroundColor: c }} />
-                  <span className="text-[0.55rem] text-stone-400 mt-1 font-mono">{c}</span>
+                  <span className="text-[0.55rem] text-stone-500 mt-1 font-mono">{c}</span>
                 </div>
               ))}
             </div>
@@ -191,17 +191,17 @@ export default function SensorialTheme({
           {/* Daily */}
           {dailyForecast.length > 0 && (
             <BentoCard span padding={false}>
-              <p className="text-xs text-stone-400 tracking-wide px-5 pt-5 pb-2">5-Day Forecast</p>
+              <p className="text-xs text-stone-500 tracking-wide px-5 pt-5 pb-2">5-Day Forecast</p>
               <div className="divide-y divide-stone-200/60">
                 {dailyForecast.map((day) => (
                   <div key={day.date} className="flex items-center px-5 py-3">
-                    <span className="w-10 text-sm text-stone-500">{new Date(day.date).toLocaleDateString(undefined, { weekday: 'short' })}</span>
+                    <span className="w-10 text-sm font-medium text-stone-700">{new Date(day.date).toLocaleDateString(undefined, { weekday: 'short' })}</span>
                     <WeatherIcon iconCode={day.icon} size={32} className="mx-3" />
-                    <span className="text-xs text-stone-400">{day.condition}</span>
+                    <span className="text-xs text-stone-500">{day.condition}</span>
                     <span className="ml-auto tabular-nums text-sm">
-                      <span className="font-bold text-stone-700">{toTemp(day.max)}°</span>
-                      <span className="text-stone-300 mx-1">/</span>
-                      <span className="text-stone-400">{toTemp(day.min)}°</span>
+                      <span className="font-bold text-stone-900">{toTemp(day.max)}°</span>
+                      <span className="text-stone-400 mx-1">/</span>
+                      <span className="text-stone-500">{toTemp(day.min)}°</span>
                     </span>
                   </div>
                 ))}
@@ -213,7 +213,7 @@ export default function SensorialTheme({
         {/* Haiku */}
         {haiku && (
           <div className="mt-10 text-center">
-            <p className="text-xl leading-relaxed text-stone-400 italic whitespace-pre-line"
+            <p className="text-xl leading-relaxed text-stone-500 italic whitespace-pre-line"
               style={{ fontFamily: "'Instrument Serif', Georgia, serif" }}>{haiku}</p>
           </div>
         )}

@@ -75,15 +75,15 @@ export default function GlassTheme({
       <div className="relative z-10 max-w-3xl mx-auto px-5 pb-20">
         {/* Hero */}
         <FrostedCard className="mt-2 text-center py-10 px-8">
-          <p className="text-xs font-semibold tracking-[0.25em] uppercase text-stone-400 mb-5">{location}</p>
+          <p className="text-xs font-semibold tracking-[0.25em] uppercase text-stone-500 mb-5">{location}</p>
           <div className="flex items-center justify-center gap-2 mb-2">
             {weatherData?.weather?.[0]?.icon && <WeatherIcon iconCode={weatherData.weather[0].icon} size={60} />}
-            <span className="text-[5.5rem] leading-none font-bold tracking-[-0.06em] text-stone-800">
+            <span className="text-[5.5rem] leading-none font-bold tracking-[-0.06em] text-stone-900">
               {weatherData ? toTemp(weatherData.main.temp) : '--'}°
             </span>
           </div>
-          <p className="text-base text-stone-500 capitalize mb-1">{weatherData?.weather?.[0]?.description}</p>
-          <p className="text-sm text-stone-400 italic mt-2 max-w-xs mx-auto">{funnyLine}</p>
+          <p className="text-base text-stone-600 capitalize mb-1">{weatherData?.weather?.[0]?.description}</p>
+          <p className="text-sm text-stone-500 italic mt-2 max-w-xs mx-auto">{funnyLine}</p>
           <div className="flex justify-center gap-2 mt-6">
             {['C', 'F'].map((u) => (
               <button key={u} onClick={() => handleSetUnit(u)}
@@ -110,15 +110,15 @@ export default function GlassTheme({
               { label: 'Pressure', value: `${weatherData.main.pressure}` },
             ].map((item) => (
               <FrostedCard key={item.label} className="text-center py-4 px-3">
-                <div className="text-lg font-bold text-stone-700 tabular-nums">{item.value}</div>
-                <div className="text-[0.65rem] text-stone-400 mt-1 tracking-wide uppercase">{item.label}</div>
+                <div className="text-lg font-bold text-stone-900 tabular-nums">{item.value}</div>
+                <div className="text-[0.65rem] text-stone-500 mt-1 tracking-wide uppercase">{item.label}</div>
               </FrostedCard>
             ))}
           </div>
         )}
 
         {/* Insights */}
-        <div className="mt-3 [&_h3]:text-stone-700 [&_p]:text-stone-600 [&>div]:mt-0">
+        <div className="mt-3 [&_h3]:text-stone-800 [&_p]:text-stone-700 [&>div]:mt-0">
           <WeatherInsights weatherData={weatherData} forecastData={forecastData} unit={unit} toTemp={toTemp}
             cardClassName="border border-white/60 shadow-sm"
             cardStyle={{ background: 'rgba(255,255,255,0.55)', backdropFilter: 'blur(24px) saturate(1.4)', WebkitBackdropFilter: 'blur(24px) saturate(1.4)' }} />
@@ -127,13 +127,13 @@ export default function GlassTheme({
         {/* Hourly */}
         {hourlyData.length > 0 && (
           <FrostedCard padding={false} className="mt-3 p-4">
-            <p className="text-xs font-semibold tracking-[0.15em] uppercase text-stone-400 mb-3 px-1">Hourly</p>
+            <p className="text-xs font-semibold tracking-[0.15em] uppercase text-stone-500 mb-3 px-1">Hourly</p>
             <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide px-1">
               {hourlyData.map((hour) => (
                 <div key={hour.dt} className="flex flex-col items-center min-w-[60px] py-2 px-1">
-                  <span className="text-[0.7rem] text-stone-400 mb-1">{new Date(hour.dt * 1000).getHours()}:00</span>
+                  <span className="text-[0.7rem] text-stone-500 mb-1">{new Date(hour.dt * 1000).getHours()}:00</span>
                   <WeatherIcon iconCode={hour.weather[0].icon} size={30} className="my-0.5" />
-                  <span className="text-sm font-bold text-stone-700">{toTemp(hour.main.temp)}°</span>
+                  <span className="text-sm font-bold text-stone-900">{toTemp(hour.main.temp)}°</span>
                   {hour.pop > 0.1 && <span className="text-[0.6rem] text-blue-400 mt-0.5">{Math.round(hour.pop * 100)}%</span>}
                 </div>
               ))}
@@ -144,17 +144,17 @@ export default function GlassTheme({
         {/* Daily */}
         {dailyForecast.length > 0 && (
           <FrostedCard padding={false} className="mt-3 overflow-hidden">
-            <p className="text-xs font-semibold tracking-[0.15em] uppercase text-stone-400 px-5 pt-5 pb-2">5-Day</p>
+            <p className="text-xs font-semibold tracking-[0.15em] uppercase text-stone-500 px-5 pt-5 pb-2">5-Day</p>
             <div className="divide-y divide-stone-200/40">
               {dailyForecast.map((day) => (
                 <div key={day.date} className="flex items-center px-5 py-3.5">
-                  <span className="w-10 text-sm text-stone-500">{new Date(day.date).toLocaleDateString(undefined, { weekday: 'short' })}</span>
+                  <span className="w-10 text-sm font-medium text-stone-700">{new Date(day.date).toLocaleDateString(undefined, { weekday: 'short' })}</span>
                   <WeatherIcon iconCode={day.icon} size={30} className="mx-3" />
-                  <span className="text-xs text-stone-400">{day.condition}</span>
+                  <span className="text-xs text-stone-500">{day.condition}</span>
                   <span className="ml-auto tabular-nums text-sm">
-                    <span className="font-bold text-stone-700">{toTemp(day.max)}°</span>
-                    <span className="text-stone-300 mx-1">/</span>
-                    <span className="text-stone-400">{toTemp(day.min)}°</span>
+                    <span className="font-bold text-stone-900">{toTemp(day.max)}°</span>
+                    <span className="text-stone-400 mx-1">/</span>
+                    <span className="text-stone-500">{toTemp(day.min)}°</span>
                   </span>
                 </div>
               ))}
@@ -164,13 +164,13 @@ export default function GlassTheme({
 
         {/* Sky palette */}
         <FrostedCard className="mt-3">
-          <p className="text-xs font-semibold tracking-[0.15em] uppercase text-stone-400 mb-3">Sky Palette</p>
+          <p className="text-xs font-semibold tracking-[0.15em] uppercase text-stone-500 mb-3">Sky Palette</p>
           <div className="h-10 rounded-2xl mb-3" style={{ background: `linear-gradient(135deg, ${palette.join(', ')})` }} />
           <div className="flex justify-between">
             {palette.map((c, i) => (
               <div key={i} className="flex flex-col items-center">
                 <div className="w-5 h-5 rounded-full border-2 border-white shadow-sm" style={{ backgroundColor: c }} />
-                <span className="text-[0.55rem] text-stone-400 mt-1 font-mono">{c}</span>
+                <span className="text-[0.55rem] text-stone-500 mt-1 font-mono">{c}</span>
               </div>
             ))}
           </div>
@@ -179,7 +179,7 @@ export default function GlassTheme({
         {/* Haiku */}
         {haiku && (
           <div className="mt-10 text-center pb-4">
-            <p className="text-xl leading-relaxed text-stone-400 italic whitespace-pre-line"
+            <p className="text-xl leading-relaxed text-stone-500 italic whitespace-pre-line"
               style={{ fontFamily: "'Instrument Serif', Georgia, serif" }}>{haiku}</p>
           </div>
         )}

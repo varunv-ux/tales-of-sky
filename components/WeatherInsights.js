@@ -231,7 +231,7 @@ export default function WeatherInsights({ weatherData, forecastData, unit, toTem
             className={`rounded-2xl px-5 py-5 ${cardClassName || "bg-taupe-100 dark:bg-taupe-800"}`}
             style={cardStyle}
           >
-            <p className="text-[1.25rem] leading-[1.3] tracking-[0.02em] text-taupe-700 dark:text-taupe-300">
+            <p className="text-[1.25rem] leading-[1.3] tracking-[0.02em] text-taupe-800 dark:text-taupe-300">
               {item.text}
             </p>
           </div>
