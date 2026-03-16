@@ -118,10 +118,12 @@ export default function GlassTheme({
         )}
 
         {/* Insights */}
-        <div className="mt-3 [&_h3]:text-stone-800 [&_p]:text-stone-700 [&>div]:mt-0">
+        <div className="mt-3">
           <WeatherInsights weatherData={weatherData} forecastData={forecastData} unit={unit} toTemp={toTemp}
             cardClassName="border border-white/60 shadow-sm"
-            cardStyle={{ background: 'rgba(255,255,255,0.55)', backdropFilter: 'blur(24px) saturate(1.4)', WebkitBackdropFilter: 'blur(24px) saturate(1.4)' }} />
+            cardStyle={{ background: 'rgba(255,255,255,0.55)', backdropFilter: 'blur(24px) saturate(1.4)', WebkitBackdropFilter: 'blur(24px) saturate(1.4)' }}
+            headingClassName="text-[1.02rem] font-bold tracking-[-0.03em] text-stone-800"
+            textClassName="text-[1.25rem] leading-[1.3] tracking-[0.02em] text-stone-800" />
         </div>
 
         {/* Hourly */}

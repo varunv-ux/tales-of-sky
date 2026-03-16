@@ -123,7 +123,7 @@ function pick(arr) {
   return arr[Math.floor(Math.random() * arr.length)];
 }
 
-export default function WeatherInsights({ weatherData, forecastData, unit, toTemp, cardClassName, cardStyle }) {
+export default function WeatherInsights({ weatherData, forecastData, unit, toTemp, cardClassName, cardStyle, textClassName, headingClassName }) {
   const data = useMemo(() => {
     if (!weatherData || !forecastData?.list) return null;
 
@@ -222,7 +222,7 @@ export default function WeatherInsights({ weatherData, forecastData, unit, toTem
 
   return (
     <div className="mt-10 text-left space-y-3">
-      <h3 className="text-[1.02rem] font-bold tracking-[-0.03em] text-taupe-800 dark:text-taupe-200">Insights</h3>
+      <h3 className={headingClassName || "text-[1.02rem] font-bold tracking-[-0.03em] text-taupe-800 dark:text-taupe-200"}>Insights</h3>
 
       <div className="grid grid-cols-2 gap-2.5">
         {data.map((item) => (
@@ -231,7 +231,7 @@ export default function WeatherInsights({ weatherData, forecastData, unit, toTem
             className={`rounded-2xl px-5 py-5 ${cardClassName || "bg-taupe-100 dark:bg-taupe-800"}`}
             style={cardStyle}
           >
-            <p className="text-[1.25rem] leading-[1.3] tracking-[0.02em] text-taupe-800 dark:text-taupe-300">
+            <p className={textClassName || "text-[1.25rem] leading-[1.3] tracking-[0.02em] text-taupe-800 dark:text-taupe-300"}>
               {item.text}
             </p>
           </div>

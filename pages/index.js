@@ -175,9 +175,9 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    document.documentElement.classList.toggle('dark', darkMode);
+    document.documentElement.classList.toggle('dark', darkMode && theme === 'default');
     window.localStorage.setItem('tales-of-sky-dark', String(darkMode));
-  }, [darkMode]);
+  }, [darkMode, theme]);
 
   // Persist and restore unit preference
   useEffect(() => {

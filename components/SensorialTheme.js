@@ -168,10 +168,12 @@ export default function SensorialTheme({
             </>
           )}
 
-          {/* Insights — full width */}
-          <div className="col-span-2 [&_h3]:text-stone-800 [&_p]:text-stone-700 [&>div]:mt-0">
+          {/* Insights */}
+          <div className="col-span-2">
             <WeatherInsights weatherData={weatherData} forecastData={forecastData} unit={unit} toTemp={toTemp}
-              cardClassName="bg-white/60 backdrop-blur-sm border border-stone-200/60" />
+              cardClassName="bg-white/60 backdrop-blur-sm border border-stone-200/60"
+              headingClassName="text-[1.02rem] font-bold tracking-[-0.03em] text-stone-800"
+              textClassName="text-[1.25rem] leading-[1.3] tracking-[0.02em] text-stone-800" />
           </div>
 
           {/* Palette */}

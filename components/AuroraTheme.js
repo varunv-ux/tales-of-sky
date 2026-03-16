@@ -114,9 +114,11 @@ export default function AuroraTheme({
         )}
 
         {/* Insights */}
-        <div className="mb-8 [&_h3]:text-stone-800 [&_p]:text-stone-700 [&>div]:mt-0">
+        <div className="mb-8">
           <WeatherInsights weatherData={weatherData} forecastData={forecastData} unit={unit} toTemp={toTemp}
-            cardClassName="bg-white/50 backdrop-blur-sm border border-stone-200/40" />
+            cardClassName="bg-white/50 backdrop-blur-sm border border-stone-200/40"
+            headingClassName="text-[1.02rem] font-bold tracking-[-0.03em] text-stone-800"
+            textClassName="text-[1.25rem] leading-[1.3] tracking-[0.02em] text-stone-800" />
         </div>
 
         {/* Hourly */}
