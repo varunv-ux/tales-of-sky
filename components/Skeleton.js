@@ -1,5 +1,5 @@
 export function SkeletonBlock({ className = '' }) {
-  return <div className={`animate-pulse bg-taupe-200 rounded-xl ${className}`} />;
+  return <div className={`animate-pulse bg-taupe-200 dark:bg-taupe-700 rounded-xl ${className}`} />;
 }
 
 export function WeatherSkeleton() {

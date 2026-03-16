@@ -11,6 +11,118 @@ function formatDuration(minutes) {
   return h > 0 ? `${h}h ${m}m` : `${m}m`;
 }
 
+// --- Creative Content ---
+
+const weatherHaikus = {
+  Clear: [
+    'Sun spills gold like wine\nnot a cloud dares to speak up\nthe sky chose today',
+    'Blue from edge to edge\nthe horizon holds its breath\nlight pours endlessly',
+    'No clouds, no excuses\nthe sun showed up for work\nand so should you',
+  ],
+  Clouds: [
+    'Grey wool overhead\nthe sky forgot to get dressed\nmoody, but make it art',
+    'Soft ceiling of grey\nthe sun is there, just hiding\npatience, it returns',
+    'Clouds stack like pillows\nthe sky is building a fort\nwe were not invited',
+  ],
+  Rain: [
+    'Rain taps on the glass\nthe world goes soft at its edges\nstay a while inside',
+    'Puddles learn to sing\nthe gutters run with silver\numbrellas bloom wide',
+    'Steady, the rain falls\neach drop a small commitment\nthe sky means it today',
+  ],
+  Drizzle: [
+    'Barely there, the rain\nindecisive little drops\nthe sky can\'t commit',
+    'A whisper of wet\nnot enough to ruin plans\njust enough to feel',
+  ],
+  Thunderstorm: [
+    'Sky cracks its knuckles\nlightning writes its signature\nnature chose violence',
+    'Thunder rolls its drums\nthe sky rehearses fury\nwe watch from inside',
+  ],
+  Snow: [
+    'White erases all\nthe city holds its cold breath\nsilence falls like snow',
+    'Flakes drift without rush\nthe world wrapped in a blanket\ntime slows to a hush',
+  ],
+  Mist: [
+    'The air wears a veil\nshapes dissolve into whispers\nnothing is quite real',
+  ],
+  Fog: [
+    'The world softly blurs\nstreetlights glow like fallen moons\nfog keeps its secrets',
+  ],
+  Haze: [
+    'Air thick with nothing\nthe horizon disappears\nsoft focus on life',
+  ],
+};
+
+const dearSkyLetters = {
+  Clear: [
+    "Dear Sky, you didn't have to go this hard today. Respectfully, {city}.",
+    "Dear Sky, this is suspiciously beautiful. What's the catch? Sincerely, {city}.",
+    "Dear Sky, we don't deserve you today. Gratefully, {city}.",
+  ],
+  Clouds: [
+    "Dear Sky, we need to talk about your grey phase. With concern, {city}.",
+    "Dear Sky, you're giving overcast chic. We see you. Fondly, {city}.",
+    "Dear Sky, take your time. We'll be here when you're ready. Patiently, {city}.",
+  ],
+  Rain: [
+    "Dear Sky, we get it. You're sad. We're all sad. Love, {city}.",
+    "Dear Sky, our umbrellas send their regards. Wetly, {city}.",
+    "Dear Sky, this is a lot. Even for you. Soggily, {city}.",
+  ],
+  Drizzle: [
+    "Dear Sky, if you're going to rain, commit. Half-heartedly, {city}.",
+    "Dear Sky, this isn't rain. This is atmospheric indecision. Dryly, {city}.",
+  ],
+  Thunderstorm: [
+    "Dear Sky, that was dramatic. Even for you. Nervously, {city}.",
+    "Dear Sky, we heard you the first time. Respectfully alarmed, {city}.",
+  ],
+  Snow: [
+    "Dear Sky, the aesthetic? Immaculate. The commute? Unacceptable. Signed, {city}.",
+    "Dear Sky, we didn't ask for a snow globe. But fine. Bundled up, {city}.",
+  ],
+  Mist: [
+    "Dear Sky, the mystery is appreciated but the visibility is not. Squinting, {city}.",
+  ],
+  Fog: [
+    "Dear Sky, we can't see you but we know you're there. Blindly, {city}.",
+  ],
+  Haze: [
+    "Dear Sky, who turned down the render distance? Confused, {city}.",
+  ],
+};
+
+const moodOutfits = {
+  'clear-warm': 'Sunglasses and main character energy.',
+  'clear-mild': 'Light layers. Easy confidence.',
+  'clear-cold': 'Puffy jacket with mysterious scarf energy.',
+  'clouds-warm': 'T-shirt philosopher vibes.',
+  'clouds-mild': 'Cozy cardigan contemplation mode.',
+  'clouds-cold': 'Full coat, no regrets.',
+  'rain': 'Umbrella protagonist era.',
+  'drizzle': 'Hoodie up, unbothered.',
+  'snow': 'Blanket burrito season. Activated.',
+  'storm': 'Indoor fort-building weather.',
+  'mist': 'Trench coat and thoughtful stare.',
+  'hot': 'Minimal fabric, maximum hydration.',
+};
+
+function getMoodKey(condition, tempC) {
+  if (['Thunderstorm'].includes(condition)) return 'storm';
+  if (['Rain'].includes(condition)) return 'rain';
+  if (['Drizzle'].includes(condition)) return 'drizzle';
+  if (['Snow'].includes(condition)) return 'snow';
+  if (['Mist', 'Fog', 'Haze', 'Smoke'].includes(condition)) return 'mist';
+  if (tempC > 32) return 'hot';
+  const tempBand = tempC > 22 ? 'warm' : tempC > 12 ? 'mild' : 'cold';
+  const sky = condition === 'Clear' ? 'clear' : 'clouds';
+  return `${sky}-${tempBand}`;
+}
+
+function pick(arr) {
+  if (!arr || !arr.length) return null;
+  return arr[Math.floor(Math.random() * arr.length)];
+}
+
 export default function WeatherInsights({ weatherData, forecastData, unit, toTemp }) {
   const data = useMemo(() => {
     if (!weatherData || !forecastData?.list) return null;
@@ -18,46 +130,14 @@ export default function WeatherInsights({ weatherData, forecastData, unit, toTem
     const now = Date.now() / 1000;
     const { sunrise, sunset } = weatherData.sys;
     const timezone = weatherData.timezone;
-
-    // Summary
-    const desc = weatherData.weather?.[0]?.description || '';
-    const temp = toTemp(weatherData.main.temp);
-    const feelsLike = toTemp(weatherData.main.feels_like);
-    const windDir = weatherData.wind?.deg != null ? degToCompass(weatherData.wind.deg) : '';
-    const windSpeed = unit === 'C' ? `${(weatherData.wind.speed * 3.6).toFixed(0)} km/h` : `${(weatherData.wind.speed * 2.237).toFixed(0)} mph`;
-    const humidity = weatherData.main.humidity;
-    const feelsLikeDelta = Math.abs(feelsLike - temp);
-
-    let summaryLine = `${desc.charAt(0).toUpperCase() + desc.slice(1)}`;
-    if (feelsLikeDelta >= 2) summaryLine += `, feels like ${feelsLike}\u00b0`;
-    summaryLine += '.';
-    const windLine = windDir ? `${windDir} at ${windSpeed}` : `${windSpeed}`;
+    const condition = weatherData.weather?.[0]?.main || 'Clear';
+    const tempC = weatherData.main.temp;
+    const cityName = weatherData.name;
 
     // Daylight
     const daylightMin = (sunset - sunrise) / 60;
     const daylightStr = formatDuration(daylightMin);
     const isDaytime = now > sunrise && now < sunset;
-    let countdownLabel, countdownValue;
-    if (isDaytime) {
-      countdownLabel = 'Sunset in';
-      countdownValue = formatDuration((sunset - now) / 60);
-    } else if (now < sunrise) {
-      countdownLabel = 'Sunrise in';
-      countdownValue = formatDuration((sunrise - now) / 60);
-    } else {
-      countdownLabel = 'Sun has set';
-      countdownValue = '';
-    }
-    const daylightPct = isDaytime ? Math.min(100, Math.round(((now - sunrise) / (sunset - sunrise)) * 100)) : 0;
-
-    // Local time
-    const localDate = new Date((now + timezone) * 1000);
-    const localTime = new Intl.DateTimeFormat('en-US', {
-      hour: 'numeric',
-      minute: '2-digit',
-      hour12: true,
-      timeZone: 'UTC',
-    }).format(localDate);
 
     // Forecast analysis
     const dailyConditions = {};
@@ -108,8 +188,22 @@ export default function WeatherInsights({ weatherData, forecastData, unit, toTem
       if (bestDay) bestDayName = new Date(bestDay.date).toLocaleDateString(undefined, { weekday: 'long' });
     }
 
-    // Build items array with consistent shape
+    // Build items
     const items = [];
+
+    // Haiku
+    const haiku = pick(weatherHaikus[condition] || weatherHaikus['Clear']);
+    if (haiku) items.push({ label: 'Haiku', text: haiku, type: 'haiku' });
+
+    // Dear Sky
+    const letters = dearSkyLetters[condition] || dearSkyLetters['Clear'];
+    const letter = pick(letters);
+    if (letter) items.push({ label: 'Dear Sky', text: letter.replace('{city}', cityName), type: 'letter' });
+
+    // Mood
+    const moodKey = getMoodKey(condition, tempC);
+    const mood = moodOutfits[moodKey];
+    if (mood) items.push({ label: 'Mood', text: mood, type: 'mood' });
 
     // Daylight
     let daylightText;
@@ -121,9 +215,6 @@ export default function WeatherInsights({ weatherData, forecastData, unit, toTem
       daylightText = `${daylightStr} of daylight today. The sun has set.`;
     }
     items.push({ label: 'Daylight', text: daylightText });
-
-    // Local Time
-    items.push({ label: 'Local time', text: `It's ${localTime} in ${weatherData.name}. ${isDaytime ? 'Currently daytime.' : 'Currently nighttime.'}` });
 
     // Outlook
     items.push({ label: 'Outlook', text: outlookText });
@@ -140,12 +231,29 @@ export default function WeatherInsights({ weatherData, forecastData, unit, toTem
 
   return (
     <div className="mt-10 text-left space-y-3">
-      <h3 className="text-[1.02rem] font-bold tracking-[-0.03em] text-taupe-800">Insights</h3>
+      <h3 className="text-[1.02rem] font-bold tracking-[-0.03em] text-taupe-800 dark:text-taupe-200">Insights</h3>
 
       <div className="grid grid-cols-2 gap-2.5">
         {data.map((item) => (
-          <div key={item.label} className={`bg-taupe-100 rounded-2xl px-5 py-5 ${item.span === 2 ? 'col-span-2' : ''}`}>
-            <p className="text-[1.25rem] leading-[1.3] tracking-[0.02em] text-taupe-700">{item.text}</p>
+          <div
+            key={item.label}
+            className={`bg-taupe-100 dark:bg-taupe-800 rounded-2xl px-5 py-5 ${
+              item.type === 'haiku' ? 'col-span-2' : ''
+            }`}
+          >
+            {item.type === 'haiku' ? (
+              <p className="text-[1.25rem] leading-[1.6] tracking-[0.02em] text-taupe-700 dark:text-taupe-300 whitespace-pre-line italic">
+                {item.text}
+              </p>
+            ) : item.type === 'letter' ? (
+              <p className="text-[1.25rem] leading-[1.3] tracking-[0.02em] text-taupe-700 dark:text-taupe-300 italic">
+                {item.text}
+              </p>
+            ) : (
+              <p className="text-[1.25rem] leading-[1.3] tracking-[0.02em] text-taupe-700 dark:text-taupe-300">
+                {item.text}
+              </p>
+            )}
           </div>
         ))}
       </div>

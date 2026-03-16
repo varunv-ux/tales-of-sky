@@ -36,7 +36,7 @@ export default function WeatherIcon({ iconCode, size = 48, className = '' }) {
       alt=""
       width={size}
       height={size}
-      className={`contrast-[1.6] brightness-[0.85] ${className}`}
+      className={`contrast-[1.6] brightness-[0.85] dark:brightness-[1.1] dark:contrast-[1.2] ${className}`}
       loading="lazy"
     />
   );

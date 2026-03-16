@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import Head from 'next/head';
 import Sidebar from '../components/Sidebar';
 import WeatherCard from '../components/WeatherCard';
@@ -6,6 +6,10 @@ import ConditionsPanel from '../components/ConditionsPanel';
 import HourlyForecast from '../components/HourlyForecast';
 import DailyForecast from '../components/DailyForecast';
 import WeatherInsights from '../components/WeatherInsights';
+import SkyScore from '../components/SkyScore';
+import SkyPalette from '../components/SkyPalette';
+import ShareCard from '../components/ShareCard';
+import ErrorBoundary from '../components/ErrorBoundary';
 import { WeatherSkeleton } from '../components/Skeleton';
 
 const API_KEY = '07aa3d7c5e90fe9b7f274297ee14f5c1';
@@ -90,10 +94,28 @@ const funnyWeatherLines = {
 };
 
 function normalizeCityList(cities) {
-  return cities.filter((city, index, allCities) => {
-    const normalized = city.toLowerCase();
-    return allCities.findIndex((entry) => entry.toLowerCase() === normalized) === index;
+  const seen = new Set();
+  return cities.filter((city) => {
+    const key = city.toLowerCase();
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
   });
+}
+
+// Simple in-memory cache for API responses
+const weatherCache = new Map();
+const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+
+function getCached(key) {
+  const entry = weatherCache.get(key);
+  if (entry && Date.now() - entry.ts < CACHE_TTL) return entry.data;
+  weatherCache.delete(key);
+  return null;
+}
+
+function setCache(key, data) {
+  weatherCache.set(key, { data, ts: Date.now() });
 }
 
 export default function Home() {
@@ -107,7 +129,34 @@ export default function Home() {
   const [error, setError] = useState('');
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [suggestions, setSuggestions] = useState([]);
+  const [darkMode, setDarkMode] = useState(false);
   const debounceRef = useRef(null);
+
+  // Persist and restore dark mode preference + detect system preference
+  useEffect(() => {
+    const stored = window.localStorage.getItem('tales-of-sky-dark');
+    if (stored !== null) {
+      setDarkMode(stored === 'true');
+    } else {
+      setDarkMode(window.matchMedia('(prefers-color-scheme: dark)').matches);
+    }
+  }, []);
+
+  useEffect(() => {
+    document.documentElement.classList.toggle('dark', darkMode);
+    window.localStorage.setItem('tales-of-sky-dark', String(darkMode));
+  }, [darkMode]);
+
+  // Persist and restore unit preference
+  useEffect(() => {
+    const storedUnit = window.localStorage.getItem('tales-of-sky-unit');
+    if (storedUnit === 'C' || storedUnit === 'F') setUnit(storedUnit);
+  }, []);
+
+  const handleSetUnit = useCallback((u) => {
+    setUnit(u);
+    window.localStorage.setItem('tales-of-sky-unit', u);
+  }, []);
 
   useEffect(() => {
     const storedCities = window.localStorage.getItem('tales-of-sky-cities');
@@ -140,17 +189,23 @@ export default function Home() {
     window.localStorage.setItem('tales-of-sky-cities', JSON.stringify(cityList));
   }, [cityList]);
 
-  const toTemp = (temp) => {
+  const toTemp = useCallback((temp) => {
     if (typeof temp !== 'number') return '--';
     return unit === 'C' ? Math.round(temp) : Math.round(temp * 9 / 5 + 32);
-  };
+  }, [unit]);
 
   const fetchForecast = async (lat, lon) => {
+    const cacheKey = `forecast-${lat.toFixed(2)}-${lon.toFixed(2)}`;
+    const cached = getCached(cacheKey);
+    if (cached) { setForecastData(cached); return; }
+
     const response = await fetch(
       `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&appid=${API_KEY}&units=metric`
     );
     const data = await response.json();
-    setForecastData(data?.list ? data : null);
+    const result = data?.list ? data : null;
+    if (result) setCache(cacheKey, result);
+    setForecastData(result);
   };
 
   const updateRecentCities = (cityName, isSearch) => {
@@ -167,12 +222,26 @@ export default function Home() {
     });
   };
 
-  const fetchWeather = async (city, isSearch = false) => {
+  const fetchWeather = async (city, isSearch = false, skipCache = false) => {
     const trimmedCity = city?.trim();
     if (!trimmedCity) return;
 
     setIsLoading(true);
     setError('');
+
+    const cacheKey = `weather-${trimmedCity.toLowerCase()}`;
+    if (!skipCache) {
+      const cached = getCached(cacheKey);
+      if (cached) {
+        setLocation(cached.name);
+        setWeatherData(cached);
+        setInput('');
+        updateRecentCities(cached.name, isSearch);
+        await fetchForecast(cached.coord.lat, cached.coord.lon);
+        setIsLoading(false);
+        return;
+      }
+    }
 
     try {
       const response = await fetch(
@@ -185,6 +254,7 @@ export default function Home() {
         return;
       }
 
+      setCache(cacheKey, data);
       setLocation(data.name);
       setWeatherData(data);
       setInput('');
@@ -197,6 +267,14 @@ export default function Home() {
       setIsLoading(false);
     }
   };
+
+  const handleRefresh = useCallback(() => {
+    if (location) fetchWeather(location, false, true);
+  }, [location]);
+
+  const removeCity = useCallback((cityToRemove) => {
+    setCityList((prev) => prev.filter((c) => c.toLowerCase() !== cityToRemove.toLowerCase()));
+  }, []);
 
   const weatherCondition = weatherData?.weather?.[0]?.main;
   const funnyLine = useMemo(() => {
@@ -228,16 +306,19 @@ export default function Home() {
     return () => clearTimeout(debounceRef.current);
   }, [input]);
 
-  const handleSuggestionClick = (suggestion) => {
+  const handleSuggestionClick = useCallback((suggestion) => {
     setSuggestions([]);
     setInput('');
     fetchWeather(suggestion.name, true);
-  };
+  }, []);
 
-  const handleSearch = () => {
+  const handleSearch = useCallback(() => {
     setSuggestions([]);
     fetchWeather(input, true);
-  };
+  }, [input]);
+
+  // Weather alerts from API (if available)
+  const alerts = weatherData?.alerts || [];
 
   const displayCities = cityList.length ? cityList : [location];
 
@@ -245,18 +326,25 @@ export default function Home() {
     <>
       <Head>
         <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-        <title>Tales of Sky</title>
+        <title>Tales of Sky — {location}</title>
+        <meta name="description" content={`Weather for ${location}. ${weatherData ? `${Math.round(weatherData.main.temp)}°C, ${weatherData.weather?.[0]?.description}` : 'Beautifully told weather.'}`} />
+        <meta property="og:title" content={`Tales of Sky — ${location}`} />
+        <meta property="og:description" content={`Weather for ${location}, beautifully told.`} />
+        <meta property="og:type" content="website" />
+        <meta name="twitter:card" content="summary" />
+        <meta name="twitter:title" content={`Tales of Sky — ${location}`} />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
       </Head>
 
-      <div className="flex min-h-screen font-sans text-taupe-800 bg-taupe-200 antialiased">
+      <div className="flex min-h-screen font-sans text-taupe-800 dark:text-taupe-200 bg-taupe-200 dark:bg-taupe-950 antialiased">
         {/* Mobile header */}
-        <div className="fixed top-0 left-0 right-0 z-20 flex items-center px-5 py-3 bg-taupe-200 border-b border-taupe-300 md:hidden">
+        <div className="fixed top-0 left-0 right-0 z-20 flex items-center px-5 py-3 bg-taupe-200 dark:bg-taupe-950 border-b border-taupe-300 dark:border-taupe-800 md:hidden">
           <button onClick={() => setSidebarOpen(true)} aria-label="Open menu" className="p-1 mr-3 text-taupe-400">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
               <line x1="3" y1="6" x2="21" y2="6" /><line x1="3" y1="12" x2="21" y2="12" /><line x1="3" y1="18" x2="21" y2="18" />
             </svg>
           </button>
-          <span className="text-lg font-black tracking-[-0.04em] text-taupe-900">Tales of Sky</span>
+          <span className="text-lg font-black tracking-[-0.04em] text-taupe-900 dark:text-taupe-100">Tales of Sky</span>
         </div>
 
         <Sidebar
@@ -267,47 +355,96 @@ export default function Home() {
           cities={displayCities}
           activeCity={location}
           onCityClick={(city) => fetchWeather(city, false)}
+          onRemoveCity={removeCity}
           isOpen={sidebarOpen}
           onClose={() => setSidebarOpen(false)}
           suggestions={suggestions}
           onSuggestionClick={handleSuggestionClick}
         />
 
-        <main className="flex-1 m-1.5 px-5 sm:px-10 pt-16 md:pt-12 pb-12 bg-taupe-50 overflow-y-auto max-h-[calc(100vh-12px)] rounded-[2rem] relative">
-          <div className="absolute top-4 right-5 flex space-x-1.5 z-10">
-            {['C', 'F'].map((u) => (
-              <button
-                key={u}
-                onClick={() => setUnit(u)}
-                aria-label={`Switch to ${u === 'C' ? 'Celsius' : 'Fahrenheit'}`}
-                className={`px-3 py-1 rounded-[999px] border text-[0.75rem] font-semibold tracking-[-0.02em] ${
-                  unit === u ? 'bg-taupe-800 text-white border-taupe-800' : 'border-taupe-200 text-taupe-500 bg-white'
-                }`}
-              >
-                °{u}
-              </button>
-            ))}
+        <main className="flex-1 m-1.5 px-5 sm:px-10 pt-16 md:pt-12 pb-12 bg-taupe-50 dark:bg-taupe-900 overflow-y-auto max-h-[calc(100vh-12px)] rounded-[2rem] relative">
+          <div className="absolute top-4 right-5 flex items-center space-x-2 z-10">
+            {/* Refresh button */}
+            <button
+              onClick={handleRefresh}
+              aria-label="Refresh weather"
+              className="p-1.5 rounded-full border border-taupe-200 dark:border-taupe-700 text-taupe-400 dark:text-taupe-500 bg-white dark:bg-taupe-800 hover:bg-taupe-100 dark:hover:bg-taupe-700 transition-colors"
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M21 2v6h-6" /><path d="M3 12a9 9 0 0 1 15-6.7L21 8" /><path d="M3 22v-6h6" /><path d="M21 12a9 9 0 0 1-15 6.7L3 16" />
+              </svg>
+            </button>
+            {/* Dark mode toggle */}
+            <button
+              onClick={() => setDarkMode((d) => !d)}
+              aria-label="Toggle dark mode"
+              className="p-1.5 rounded-full border border-taupe-200 dark:border-taupe-700 text-taupe-400 dark:text-taupe-500 bg-white dark:bg-taupe-800 hover:bg-taupe-100 dark:hover:bg-taupe-700 transition-colors"
+            >
+              {darkMode ? (
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="12" cy="12" r="5" /><line x1="12" y1="1" x2="12" y2="3" /><line x1="12" y1="21" x2="12" y2="23" /><line x1="4.22" y1="4.22" x2="5.64" y2="5.64" /><line x1="18.36" y1="18.36" x2="19.78" y2="19.78" /><line x1="1" y1="12" x2="3" y2="12" /><line x1="21" y1="12" x2="23" y2="12" /><line x1="4.22" y1="19.78" x2="5.64" y2="18.36" /><line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+                </svg>
+              ) : (
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+                </svg>
+              )}
+            </button>
+            {/* Unit toggle */}
+            <div className="flex space-x-1.5">
+              {['C', 'F'].map((u) => (
+                <button
+                  key={u}
+                  onClick={() => handleSetUnit(u)}
+                  aria-label={`Switch to ${u === 'C' ? 'Celsius' : 'Fahrenheit'}`}
+                  className={`px-3 py-1 rounded-[999px] border text-[0.75rem] font-semibold tracking-[-0.02em] ${
+                    unit === u ? 'bg-taupe-800 dark:bg-taupe-200 text-white dark:text-taupe-900 border-taupe-800 dark:border-taupe-200' : 'border-taupe-200 dark:border-taupe-700 text-taupe-500 dark:text-taupe-400 bg-white dark:bg-taupe-800'
+                  }`}
+                >
+                  °{u}
+                </button>
+              ))}
+            </div>
           </div>
+
+          {/* Weather alerts banner */}
+          {alerts.length > 0 && (
+            <div className="mb-4 max-w-[42rem] mx-auto">
+              {alerts.map((alert, i) => (
+                <div key={i} className="bg-amber-100 dark:bg-amber-900/30 border border-amber-300 dark:border-amber-700 rounded-xl px-4 py-3 mb-2 text-left">
+                  <p className="text-[0.85rem] font-semibold text-amber-800 dark:text-amber-300">{alert.event}</p>
+                  <p className="text-[0.78rem] text-amber-700 dark:text-amber-400 mt-0.5 line-clamp-2">{alert.description}</p>
+                </div>
+              ))}
+            </div>
+          )}
+
           <div className="max-w-[42rem] mx-auto space-y-5 text-center">
+            <ErrorBoundary>
             {isLoading && !weatherData ? (
               <WeatherSkeleton />
             ) : (
               <>
                 <WeatherCard
+                  key={location}
                   location={location}
                   weatherData={weatherData}
                   isLoading={isLoading}
                   funnyLine={funnyLine}
                   unit={unit}
-                  setUnit={setUnit}
+                  setUnit={handleSetUnit}
                   toTemp={toTemp}
                 />
+                <SkyScore weatherData={weatherData} unit={unit} toTemp={toTemp} />
+                <SkyPalette weatherData={weatherData} />
                 <ConditionsPanel weatherData={weatherData} unit={unit} toTemp={toTemp} />
                 <WeatherInsights weatherData={weatherData} forecastData={forecastData} unit={unit} toTemp={toTemp} />
                 <HourlyForecast forecastData={forecastData} unit={unit} toTemp={toTemp} />
                 <DailyForecast forecastData={forecastData} unit={unit} toTemp={toTemp} />
+                <ShareCard weatherData={weatherData} unit={unit} toTemp={toTemp} funnyLine={funnyLine} />
               </>
             )}
+            </ErrorBoundary>
           </div>
         </main>
       </div>

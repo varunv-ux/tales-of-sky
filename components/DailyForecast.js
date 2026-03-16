@@ -29,17 +29,17 @@ export default function DailyForecast({ forecastData, unit, toTemp }) {
 
   return (
     <div className="mt-10 text-left space-y-3">
-      <h3 className="text-[1.02rem] font-bold tracking-[-0.03em] text-taupe-800">5-Day Forecast</h3>
-      <div className="rounded-2xl bg-taupe-100 divide-y divide-taupe-200 overflow-hidden">
+      <h3 className="text-[1.02rem] font-bold tracking-[-0.03em] text-taupe-800 dark:text-taupe-200">5-Day Forecast</h3>
+      <div className="rounded-2xl bg-taupe-100 dark:bg-taupe-800 divide-y divide-taupe-200 dark:divide-taupe-700 overflow-hidden">
         {dailyForecast.map((day) => (
           <div key={day.date} className="flex items-center px-5 py-4 text-[1rem] font-semibold tracking-[-0.03em]">
-            <span className="w-12 text-taupe-700">{new Date(day.date).toLocaleDateString(undefined, { weekday: 'short' })}</span>
+            <span className="w-12 text-taupe-700 dark:text-taupe-300">{new Date(day.date).toLocaleDateString(undefined, { weekday: 'short' })}</span>
             <WeatherIcon iconCode={day.icon} size={40} className="mx-3" />
-            <span className="text-[0.85rem] font-medium text-taupe-400">{day.condition}</span>
+            <span className="text-[0.85rem] font-medium text-taupe-400 dark:text-taupe-500">{day.condition}</span>
             <span className="ml-auto tabular-nums">
-              <span className="text-taupe-800">{toTemp(day.max)}°</span>
+              <span className="text-taupe-800 dark:text-taupe-200">{toTemp(day.max)}°</span>
               <span className="text-taupe-400 mx-1">/</span>
-              <span className="text-taupe-400">{toTemp(day.min)}°</span>
+              <span className="text-taupe-400 dark:text-taupe-500">{toTemp(day.min)}°</span>
             </span>
           </div>
         ))}
