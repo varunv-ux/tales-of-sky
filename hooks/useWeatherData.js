@@ -1,11 +1,13 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { getSkyPalette } from '../components/SkyPalette';
+import { weatherHaikus } from '../components/WeatherInsights';
 
-const API_KEY = '07aa3d7c5e90fe9b7f274297ee14f5c1';
+const API_KEY = process.env.NEXT_PUBLIC_OWM_API_KEY;
 const DEFAULT_CITY = 'New York';
 
-const funnyWeatherLines = {
+export const funnyWeatherLines = {
   Clear: [
-    'The sun showed up and chose violence',
+    'The sun showed up and chose violence ☀️',
     'Not a cloud in sight. Suspiciously optimistic.',
     'Sunglasses weather. You deserve this.',
     'The sky is flirting with you today.',
@@ -13,7 +15,7 @@ const funnyWeatherLines = {
     'Plot twist: the weather is actually nice.',
   ],
   Clouds: [
-    'Cloudy with a chance of deep thoughts',
+    'Cloudy with a chance of deep thoughts ☁️',
     'Overcast and overthinking.',
     'The sky is buffering.',
     'Mood: grey but make it aesthetic.',
@@ -29,14 +31,14 @@ const funnyWeatherLines = {
     'Rain check on your plans. Literally.',
   ],
   Drizzle: [
-    'Barely rain. Like the sky changed its mind',
+    'Barely rain. Like the sky changed its mind 💧',
     'Sprinkle vibes only.',
     'The sky is spitting. Rude.',
     'Not enough to cancel plans. Unfortunately.',
     'Is it raining? Technically.',
   ],
   Thunderstorm: [
-    'Thor is practicing again',
+    'Thor is practicing again ⚡',
     'Time to reenact dramatic movie scenes.',
     'The sky is having a tantrum.',
     'Perfect ambiance for an existential crisis.',
@@ -44,7 +46,7 @@ const funnyWeatherLines = {
     'Free light show, no tickets needed.',
   ],
   Snow: [
-    'Fluffy sky sadness',
+    'Fluffy sky sadness ❄️',
     'Snow excuse to stay inside.',
     'Winter has entered the chat.',
     'The world is a snow globe. You\'re the figurine.',
@@ -52,7 +54,7 @@ const funnyWeatherLines = {
     'Snow day! Or as adults call it… a day.',
   ],
   Mist: [
-    'It\'s misty. So mysterious',
+    'It\'s misty. So mysterious 🌫️',
     'Where\'s the Sherlock theme?',
     'Main character energy. Zero visibility.',
     'The vibes are immaculate. The roads are not.',
@@ -70,12 +72,12 @@ const funnyWeatherLines = {
     'Everything looks like a 90s music video.',
   ],
   Smoke: [
-    'Air\'s got some extra seasoning',
+    'Air\'s got some extra seasoning 🔥',
     'Smokey vibes. Not the fun kind.',
     'The air is being dramatic today.',
   ],
   Dust: [
-    'It\'s exfoliation weather',
+    'It\'s exfoliation weather 💨',
     'Free dermabrasion from Mother Nature.',
     'Close your windows. And your mouth.',
   ],
@@ -97,8 +99,12 @@ const CACHE_TTL = 5 * 60 * 1000;
 function getCached(key) {
   const entry = weatherCache.get(key);
   if (entry && Date.now() - entry.ts < CACHE_TTL) return entry.data;
-  weatherCache.delete(key);
   return null;
+}
+
+function getStaleCache(key) {
+  const entry = weatherCache.get(key);
+  return entry ? entry.data : null;
 }
 
 function setCache(key, data) {
@@ -117,8 +123,37 @@ export default function useWeatherData() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [suggestions, setSuggestions] = useState([]);
   const [darkMode, setDarkMode] = useState(false);
+  const [theme, setTheme] = useState('default');
+  const [alerts, setAlerts] = useState([]);
   const debounceRef = useRef(null);
 
+  // Theme persistence + body class
+  useEffect(() => {
+    const storedTheme = window.localStorage.getItem('tales-of-sky-theme');
+    if (['default', 'aurora'].includes(storedTheme)) {
+      setTheme(storedTheme);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (theme === 'default') {
+      document.body.classList.add('layout-default');
+      document.body.classList.remove('layout-variant');
+    } else {
+      document.body.classList.add('layout-variant');
+      document.body.classList.remove('layout-default');
+    }
+    return () => {
+      document.body.classList.remove('layout-default', 'layout-variant');
+    };
+  }, [theme]);
+
+  const handleSetTheme = useCallback((t) => {
+    setTheme(t);
+    window.localStorage.setItem('tales-of-sky-theme', t);
+  }, []);
+
+  // Dark mode persistence
   useEffect(() => {
     const stored = window.localStorage.getItem('tales-of-sky-dark');
     if (stored !== null) {
@@ -129,10 +164,11 @@ export default function useWeatherData() {
   }, []);
 
   useEffect(() => {
-    document.documentElement.classList.toggle('dark', darkMode);
+    document.documentElement.classList.toggle('dark', darkMode && theme === 'default');
     window.localStorage.setItem('tales-of-sky-dark', String(darkMode));
-  }, [darkMode]);
+  }, [darkMode, theme]);
 
+  // Unit persistence
   useEffect(() => {
     const storedUnit = window.localStorage.getItem('tales-of-sky-unit');
     if (storedUnit === 'C' || storedUnit === 'F') setUnit(storedUnit);
@@ -152,13 +188,32 @@ export default function useWeatherData() {
     const cacheKey = `forecast-${lat.toFixed(2)}-${lon.toFixed(2)}`;
     const cached = getCached(cacheKey);
     if (cached) { setForecastData(cached); return; }
-    const response = await fetch(
-      `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&appid=${API_KEY}&units=metric`
-    );
-    const data = await response.json();
-    const result = data?.list ? data : null;
-    if (result) setCache(cacheKey, result);
-    setForecastData(result);
+    try {
+      const response = await fetch(
+        `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&appid=${API_KEY}&units=metric`
+      );
+      const data = await response.json();
+      const result = data?.list ? data : null;
+      if (result) setCache(cacheKey, result);
+      setForecastData(result);
+    } catch {
+      // Use stale cache if available
+      const stale = getStaleCache(cacheKey);
+      if (stale) setForecastData(stale);
+    }
+  };
+
+  // Fetch weather alerts (OneCall API — may not be available on free tier)
+  const fetchAlerts = async (lat, lon) => {
+    try {
+      const res = await fetch(
+        `https://api.openweathermap.org/data/2.5/onecall?lat=${lat}&lon=${lon}&exclude=minutely,hourly,daily&appid=${API_KEY}`
+      );
+      const data = await res.json();
+      setAlerts(Array.isArray(data?.alerts) ? data.alerts : []);
+    } catch {
+      setAlerts([]);
+    }
   };
 
   const updateRecentCities = (cityName, isSearch) => {
@@ -185,6 +240,7 @@ export default function useWeatherData() {
         setInput('');
         updateRecentCities(cached.name, isSearch);
         await fetchForecast(cached.coord.lat, cached.coord.lon);
+        fetchAlerts(cached.coord.lat, cached.coord.lon);
         setIsLoading(false);
         return;
       }
@@ -205,14 +261,24 @@ export default function useWeatherData() {
       setInput('');
       updateRecentCities(data.name, isSearch);
       await fetchForecast(data.coord.lat, data.coord.lon);
+      fetchAlerts(data.coord.lat, data.coord.lon);
     } catch (requestError) {
       console.error('Weather fetch failed', requestError);
-      setError('Could not load weather right now');
+      // Fall back to stale cache
+      const stale = getStaleCache(cacheKey);
+      if (stale) {
+        setLocation(stale.name);
+        setWeatherData(stale);
+        setError('Showing cached data — network unavailable');
+      } else {
+        setError('Could not load weather right now');
+      }
     } finally {
       setIsLoading(false);
     }
   };
 
+  // Load saved cities + initial weather
   useEffect(() => {
     const storedCities = window.localStorage.getItem('tales-of-sky-cities');
     if (storedCities) {
@@ -257,10 +323,16 @@ export default function useWeatherData() {
     return lines ? lines[Math.floor(Math.random() * lines.length)] : 'Weather is undecided.';
   }, [weatherCondition]);
 
+  const haiku = useMemo(() => {
+    const lines = weatherHaikus[weatherCondition] || weatherHaikus['Clear'];
+    return lines ? lines[Math.floor(Math.random() * lines.length)] : null;
+  }, [weatherCondition]);
+
+  // Debounced search suggestions
   useEffect(() => {
+    if (debounceRef.current) clearTimeout(debounceRef.current);
     const trimmed = input.trim();
     if (trimmed.length < 2) { setSuggestions([]); return; }
-    clearTimeout(debounceRef.current);
     debounceRef.current = setTimeout(async () => {
       try {
         const res = await fetch(
@@ -290,12 +362,40 @@ export default function useWeatherData() {
 
   const displayCities = cityList.length ? cityList : [location];
 
+  // Computed derived data
+  const palette = useMemo(() => {
+    if (!weatherData) return ['#E8E5E3', '#D6D2CF', '#ACA7A2', '#827A74', '#564F4D'];
+    return getSkyPalette(weatherCondition, weatherData.timezone);
+  }, [weatherData, weatherCondition]);
+
+  const hourlyData = useMemo(() => {
+    if (!forecastData?.list) return [];
+    return forecastData.list.slice(0, 8);
+  }, [forecastData]);
+
+  const dailyForecast = useMemo(() => {
+    if (!forecastData?.list) return [];
+    const daily = {};
+    forecastData.list.forEach((item) => {
+      const date = new Date(item.dt * 1000).toDateString();
+      if (!daily[date]) {
+        daily[date] = { date, min: item.main.temp_min, max: item.main.temp_max, icon: item.weather[0].icon, condition: item.weather[0].main };
+      } else {
+        daily[date].min = Math.min(daily[date].min, item.main.temp_min);
+        daily[date].max = Math.max(daily[date].max, item.main.temp_max);
+      }
+    });
+    return Object.values(daily).slice(0, 5);
+  }, [forecastData]);
+
   return {
     cityList, location, unit, input, setInput,
     weatherData, forecastData, isLoading, error,
     sidebarOpen, setSidebarOpen, suggestions, darkMode, setDarkMode,
+    theme, handleSetTheme,
     handleSetUnit, toTemp, handleRefresh, removeCity,
-    funnyLine, weatherCondition, displayCities,
+    funnyLine, haiku, weatherCondition, displayCities,
     fetchWeather, handleSearch, handleSuggestionClick,
+    palette, hourlyData, dailyForecast, alerts,
   };
 }

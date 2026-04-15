@@ -16,7 +16,9 @@ const conditionImageMap = {
 };
 
 export default function WeatherCard({ location, weatherData, isLoading, funnyLine, unit, setUnit, toTemp }) {
-  const condition = weatherData?.weather?.[0]?.main;
+  if (!weatherData) return null;
+
+  const condition = weatherData.weather?.[0]?.main;
   const slug = useMemo(() => location.toLowerCase().replace(/ /g, '-'), [location]);
   const conditionSlug = conditionImageMap[condition] || 'default';
   const [imgFallbackLevel, setImgFallbackLevel] = useState(0);

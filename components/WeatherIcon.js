@@ -21,7 +21,7 @@ const iconMap = {
   '50n': 'mist',
 };
 
-const CDN_BASE = 'https://raw.githubusercontent.com/basmilius/weather-icons/dev/production/fill/svg';
+const CDN_BASE = '/weather-icons';
 
 export function getWeatherIconUrl(iconCode) {
   const name = iconMap[iconCode] || 'not-available';

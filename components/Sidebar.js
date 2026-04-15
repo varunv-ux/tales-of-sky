@@ -1,4 +1,4 @@
-export default function Sidebar({ input, setInput, onSearch, error, cities, activeCity, onCityClick, onRemoveCity, isOpen, onClose, suggestions, onSuggestionClick }) {
+export default function Sidebar({ input, setInput, onSearch, error, cities, activeCity, onCityClick, onRemoveCity, isOpen, onClose, suggestions, onSuggestionClick, themePicker }) {
   return (
     <>
       {/* Mobile overlay */}
@@ -111,6 +111,13 @@ export default function Sidebar({ input, setInput, onSearch, error, cities, acti
             ))}
           </div>
         </div>
+
+        {/* Theme picker at bottom */}
+        {themePicker && (
+          <div className="px-5 py-4 border-t border-taupe-300/40 dark:border-taupe-700/40 flex">
+            {themePicker}
+          </div>
+        )}
       </aside>
     </>
   );

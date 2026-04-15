@@ -88,7 +88,7 @@ body {
    DESIGN VARIANT STYLES
    ============================================= */
 
-/* --- Shared: Warm floating blob animations (Aurora + Glass + Sensorial) --- */
+/* --- Shared: Warm floating blob animations (Aurora) --- */
 @keyframes blob-drift-1 {
   0%, 100% { transform: translate(0, 0) scale(1) rotate(0deg); }
   33% { transform: translate(40px, -30px) scale(1.1) rotate(5deg); }
@@ -111,12 +111,7 @@ body {
 .aurora-blob-2 { animation: blob-drift-2 28s ease-in-out infinite; }
 .aurora-blob-3 { animation: blob-drift-3 20s ease-in-out infinite; }
 
-/* Sensorial blobs */
-.sensorial-blob-1 { animation: blob-drift-1 20s ease-in-out infinite; }
-.sensorial-blob-2 { animation: blob-drift-2 25s ease-in-out infinite; }
-.sensorial-blob-3 { animation: blob-drift-3 18s ease-in-out infinite; }
-
-/* Iridescent sphere — slow rotation with shimmer (Aurora + Sensorial) */
+/* Iridescent sphere — slow rotation with shimmer (Aurora) */
 @keyframes sphere-rotate {
   0% { transform: rotate(0deg) scale(1); }
   50% { transform: rotate(180deg) scale(1.05); }
