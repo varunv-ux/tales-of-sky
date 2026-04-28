@@ -1,5 +1,5 @@
 import Image from 'next/image';
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import WeatherIcon from './WeatherIcon';
 
 // Map OWM conditions to our 7 image condition slugs
@@ -44,6 +44,11 @@ export default function WeatherCard({ location, weatherData, isLoading, funnyLin
   const conditionSlug = conditionImageMap[condition] || 'clear';
   const season = useMemo(() => getSeason(weatherData.coord?.lat || 0, weatherData.timezone || 0), [weatherData]);
   const [imgFallbackLevel, setImgFallbackLevel] = useState(0);
+
+  // Reset fallback when city/condition/season changes
+  useEffect(() => {
+    setImgFallbackLevel(0);
+  }, [citySlug, conditionSlug, season]);
 
   const imgSrc = useMemo(() => {
     const imageFile = `${season}-${conditionSlug}.webp`;
