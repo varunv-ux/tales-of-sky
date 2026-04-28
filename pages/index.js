@@ -57,18 +57,45 @@ export default function Home() {
 
   const isAurora = theme === 'aurora' && !isLoading;
 
+  const SITE_URL = 'https://tales-of-sky-tau.vercel.app';
+  const pageTitle = `Tales of Sky — ${location}`;
+  const pageDesc = weatherData
+    ? `Weather for ${location}: ${Math.round(weatherData.main.temp)}°C, ${weatherData.weather?.[0]?.description}. Beautifully told.`
+    : `Weather for ${location}, beautifully told.`;
+
   return (
     <>
       <Head>
-        <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-        <title>{`Tales of Sky \u2014 ${location}`}</title>
-        <meta name="description" content={`Weather for ${location}. ${weatherData ? `${Math.round(weatherData.main.temp)}\u00b0C, ${weatherData.weather?.[0]?.description}` : 'Beautifully told weather.'}`} />
-        <meta property="og:title" content={`Tales of Sky \u2014 ${location}`} />
-        <meta property="og:description" content={`Weather for ${location}, beautifully told.`} />
-        <meta property="og:type" content="website" />
-        <meta name="twitter:card" content="summary" />
-        <meta name="twitter:title" content={`Tales of Sky \u2014 ${location}`} />
+        <title>{pageTitle}</title>
+        <meta name="description" content={pageDesc} />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+        {/* Canonical */}
+        <link rel="canonical" href={SITE_URL} />
+
+        {/* Open Graph */}
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content={SITE_URL} />
+        <meta property="og:title" content={pageTitle} />
+        <meta property="og:description" content={pageDesc} />
+        <meta property="og:image" content={`${SITE_URL}/og-image.png`} />
+        <meta property="og:image:width" content="1200" />
+        <meta property="og:image:height" content="630" />
+        <meta property="og:image:alt" content="Tales of Sky — Weather, beautifully told" />
+        <meta property="og:site_name" content="Tales of Sky" />
+        <meta property="og:locale" content="en_US" />
+
+        {/* Twitter Card */}
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={pageTitle} />
+        <meta name="twitter:description" content={pageDesc} />
+        <meta name="twitter:image" content={`${SITE_URL}/og-image.png`} />
+        <meta name="twitter:image:alt" content="Tales of Sky — Weather, beautifully told" />
+
+        {/* Additional SEO */}
+        <meta name="application-name" content="Tales of Sky" />
+        <meta name="keywords" content="weather, forecast, ghibli, beautiful weather app, sky, tales of sky, weather art" />
+        <meta name="author" content="Tales of Sky" />
       </Head>
 
       <div className="flex h-screen font-sans text-taupe-800 dark:text-taupe-200 bg-taupe-200 dark:bg-taupe-950 antialiased">
