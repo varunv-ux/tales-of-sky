@@ -106,6 +106,21 @@ const moodOutfits = {
   'hot': 'Minimal fabric, maximum hydration.',
 };
 
+const profaneMoodOutfits = {
+  'clear-warm': 'Sunglasses and zero f*cks energy.',
+  'clear-mild': 'Light layers. Main character sh*t.',
+  'clear-cold': 'Puffy jacket and a "don\'t talk to me" scarf.',
+  'clouds-warm': 'T-shirt and existential dread. Classic.',
+  'clouds-mild': 'Cozy cardigan, dead inside. Vibes.',
+  'clouds-cold': 'Full coat, no regrets, no will to live.',
+  'rain': 'Umbrella protagonist energy. You dramatic b*tch.',
+  'drizzle': 'Hoodie up. Unbothered. Moisturized. Thriving.',
+  'snow': 'Blanket burrito or death. No in-between.',
+  'storm': 'Stay the f*ck inside weather.',
+  'mist': 'Trench coat and murder mystery protagonist.',
+  'hot': 'Minimal fabric. Maximum sweating. Gross.',
+};
+
 function getMoodKey(condition, tempC) {
   if (['Thunderstorm'].includes(condition)) return 'storm';
   if (['Rain'].includes(condition)) return 'rain';
@@ -123,7 +138,7 @@ function pick(arr) {
   return arr[Math.floor(Math.random() * arr.length)];
 }
 
-export default function WeatherInsights({ weatherData, forecastData, unit, toTemp, cardClassName, cardStyle, textClassName, headingClassName }) {
+export default function WeatherInsights({ weatherData, forecastData, unit, toTemp, cardClassName, cardStyle, textClassName, headingClassName, profanityMode }) {
   const data = useMemo(() => {
     if (!weatherData || !forecastData?.list) return null;
 
@@ -193,30 +208,50 @@ export default function WeatherInsights({ weatherData, forecastData, unit, toTem
 
     // Mood
     const moodKey = getMoodKey(condition, tempC);
-    const mood = moodOutfits[moodKey];
+    const moodSource = profanityMode ? profaneMoodOutfits : moodOutfits;
+    const mood = moodSource[moodKey];
     if (mood) items.push({ label: 'Mood', text: mood });
 
     // Daylight
     let daylightText;
     if (isDaytime) {
-      daylightText = `${daylightStr} of daylight today. Sunset in ${formatDuration((sunset - now) / 60)}.`;
+      const timeToSunset = formatDuration((sunset - now) / 60);
+      daylightText = profanityMode
+        ? `${daylightStr} of daylight. Sun dips in ${timeToSunset}. Tick tock, b*tch.`
+        : `${daylightStr} of daylight today. Sunset in ${timeToSunset}.`;
     } else if (now < sunrise) {
-      daylightText = `${daylightStr} of daylight today. Sunrise in ${formatDuration((sunrise - now) / 60)}.`;
+      const timeToSunrise = formatDuration((sunrise - now) / 60);
+      daylightText = profanityMode
+        ? `Still dark. Sunrise in ${timeToSunrise}. Go back to bed.`
+        : `${daylightStr} of daylight ahead. Sunrise in ${timeToSunrise}.`;
     } else {
-      daylightText = `${daylightStr} of daylight today. The sun has set.`;
+      const nextSunrise = sunrise + 86400;
+      const timeToNextSunrise = formatDuration((nextSunrise - now) / 60);
+      daylightText = profanityMode
+        ? `Sun\'s gone. ${daylightStr} of daylight today. Next sunrise in ~${timeToNextSunrise}. Deal with it.`
+        : `${daylightStr} of daylight today. The night is here. Next sunrise in ~${timeToNextSunrise}.`;
     }
     items.push({ label: 'Daylight', text: daylightText });
 
     // Outlook
-    items.push({ label: 'Outlook', text: outlookText });
+    let outlookFinal = outlookText;
+    if (profanityMode) {
+      if (rainyDays.length >= 3) outlookFinal = `Rain won\'t shut the f*ck up this week.`;
+      else if (rainyDays.length > 0) outlookFinal = outlookText.replace('Otherwise clear.', 'Otherwise clear. Lucky bastards.');
+      else outlookFinal = 'Dry all week. Don\'t get used to it.';
+    }
+    items.push({ label: 'Outlook', text: outlookFinal });
 
     // Best Day
     if (bestDayName) {
-      items.push({ label: 'Best day', text: `${bestDayName} is your best bet this week for outdoor plans.` });
+      const bestDayText = profanityMode
+        ? `${bestDayName} is the least sh*tty day this week. Plan accordingly.`
+        : `${bestDayName} is your best bet this week for outdoor plans.`;
+      items.push({ label: 'Best day', text: bestDayText });
     }
 
     return items;
-  }, [weatherData, forecastData, unit, toTemp]);
+  }, [weatherData, forecastData, unit, toTemp, profanityMode]);
 
   if (!data?.length) return null;
 

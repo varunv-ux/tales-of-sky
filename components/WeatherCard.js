@@ -2,32 +2,59 @@ import Image from 'next/image';
 import { useState, useMemo } from 'react';
 import WeatherIcon from './WeatherIcon';
 
-// Map weather conditions to fallback images
+// Map OWM conditions to our 7 image condition slugs
 const conditionImageMap = {
   Clear: 'clear',
-  Clouds: 'clouds',
+  Clouds: 'cloudy',
   Rain: 'rain',
   Drizzle: 'rain',
   Thunderstorm: 'thunderstorm',
   Snow: 'snow',
   Mist: 'mist',
   Fog: 'mist',
-  Haze: 'haze',
+  Haze: 'mist',
+  Smoke: 'mist',
+  Dust: 'mist',
 };
+
+// Cities that have dedicated image folders
+const SUPPORTED_CITIES = new Set([
+  'seattle', 'new-york', 'london', 'tokyo', 'paris',
+  'delhi', 'new-delhi', 'dubai', 'sydney', 'san-francisco', 'singapore',
+]);
+
+function getSeason(lat, timezone) {
+  const now = new Date();
+  const utcMs = now.getTime() + now.getTimezoneOffset() * 60000;
+  const localMonth = new Date(utcMs + timezone * 1000).getMonth(); // 0-11
+  const isNorthern = lat >= 0;
+
+  // Mar-May=spring, Jun-Aug=summer, Sep-Nov=autumn, Dec-Feb=winter (northern)
+  if (localMonth >= 2 && localMonth <= 4) return isNorthern ? 'spring' : 'autumn';
+  if (localMonth >= 5 && localMonth <= 7) return isNorthern ? 'summer' : 'winter';
+  if (localMonth >= 8 && localMonth <= 10) return isNorthern ? 'autumn' : 'spring';
+  return isNorthern ? 'winter' : 'summer';
+}
 
 export default function WeatherCard({ location, weatherData, isLoading, funnyLine, unit, setUnit, toTemp }) {
   if (!weatherData) return null;
 
   const condition = weatherData.weather?.[0]?.main;
-  const slug = useMemo(() => location.toLowerCase().replace(/ /g, '-'), [location]);
-  const conditionSlug = conditionImageMap[condition] || 'default';
+  const citySlug = useMemo(() => location.toLowerCase().replace(/ /g, '-'), [location]);
+  const conditionSlug = conditionImageMap[condition] || 'clear';
+  const season = useMemo(() => getSeason(weatherData.coord?.lat || 0, weatherData.timezone || 0), [weatherData]);
   const [imgFallbackLevel, setImgFallbackLevel] = useState(0);
 
   const imgSrc = useMemo(() => {
-    if (imgFallbackLevel === 0) return `/ghibli/${slug}.jpg`;
-    if (imgFallbackLevel === 1) return `/ghibli/${conditionSlug}.jpg`;
+    const imageFile = `${season}-${conditionSlug}.webp`;
+    if (imgFallbackLevel === 0 && SUPPORTED_CITIES.has(citySlug)) {
+      return `/weather-images/${citySlug}/${imageFile}`;
+    }
+    if (imgFallbackLevel <= 1) {
+      return `/weather-images/generic/${imageFile}`;
+    }
     return '/ghibli/default.jpg';
-  }, [slug, conditionSlug, imgFallbackLevel]);
+  }, [citySlug, conditionSlug, season, imgFallbackLevel]);
 
   const handleImageError = () => {
     setImgFallbackLevel((prev) => Math.min(prev + 1, 2));
@@ -50,7 +77,7 @@ export default function WeatherCard({ location, weatherData, isLoading, funnyLin
         {isLoading ? 'Checking the sky...' : funnyLine}
       </p>
 
-      <div className="relative w-full h-[250px] rounded-[1.5rem] overflow-hidden shadow-sm">
+      <div className="relative w-full aspect-[16/9] rounded-[1.5rem] overflow-hidden shadow-sm">
         <Image
           src={imgSrc}
           alt={location}

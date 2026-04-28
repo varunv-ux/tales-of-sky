@@ -24,7 +24,7 @@ const conditionVibes = {
 export default function AuroraTheme({
   location, unit, weatherData, forecastData, isLoading, weatherCondition,
   handleSetUnit, toTemp, handleRefresh, funnyLine, haiku,
-  hourlyData, dailyForecast, palette, ThemePicker, alerts, darkMode, setDarkMode,
+  hourlyData, dailyForecast, palette, ThemePicker, alerts, darkMode, setDarkMode, profanityMode,
 }) {
   if (!weatherData) return null;
 
@@ -126,7 +126,7 @@ export default function AuroraTheme({
         <div className="flex justify-center mb-12">
           <div className="relative">
             <div className="w-48 h-48 rounded-full sensorial-sphere"
-              style={{ background: `conic-gradient(from 120deg, ${b1}, ${b2}, ${b3}, ${b1})` }} />
+              style={{ background: `conic-gradient(from 120deg, ${palette[0]}, ${palette[1]}, ${palette[2]}, ${palette[3]}, ${palette[4]}, ${palette[0]})` }} />
             <div className="absolute inset-0 rounded-full"
               style={{ background: `radial-gradient(circle at 35% 35%, ${d ? 'rgba(255,255,255,0.2)' : 'rgba(255,255,255,0.5)'} 0%, transparent 60%)` }} />
           </div>
@@ -151,7 +151,7 @@ export default function AuroraTheme({
 
         {/* Insights */}
         <div className="mb-8">
-          <WeatherInsights weatherData={weatherData} forecastData={forecastData} unit={unit} toTemp={toTemp}
+          <WeatherInsights weatherData={weatherData} forecastData={forecastData} unit={unit} toTemp={toTemp} profanityMode={profanityMode}
             cardClassName={`backdrop-blur-sm border ${cardBg}`}
             headingClassName={`text-[1.02rem] font-bold tracking-[-0.03em] ${textPrimary}`}
             textClassName={`text-[1.25rem] leading-[1.3] tracking-[0.02em] ${d ? 'text-stone-300' : 'text-stone-800'}`} />
@@ -161,9 +161,9 @@ export default function AuroraTheme({
         {hourlyData.length > 0 && (
           <div className="mb-8">
             <p className={`text-xs font-semibold tracking-[0.15em] uppercase ${textSecondary} mb-3`}>Hourly</p>
-            <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
-              {hourlyData.map((hour) => (
-                <div key={hour.dt} className={`backdrop-blur-sm rounded-2xl border px-4 py-3 text-center min-w-[70px] shrink-0 ${cardBg}`}>
+            <div className="grid grid-cols-4 sm:grid-cols-8 gap-2 pb-2">
+              {hourlyData.slice(0, 8).map((hour) => (
+                <div key={hour.dt} className={`backdrop-blur-sm rounded-2xl border px-2 py-3 text-center ${cardBg}`}>
                   <div className={`text-[0.7rem] ${textSecondary} mb-0.5`}>{new Date(hour.dt * 1000).getHours()}:00</div>
                   <WeatherIcon iconCode={hour.weather[0].icon} size={32} className="mx-auto my-0.5" />
                   <div className={`text-sm font-bold ${textPrimary}`}>{toTemp(hour.main.temp)}°</div>

@@ -6,81 +6,303 @@ const API_KEY = process.env.NEXT_PUBLIC_OWM_API_KEY;
 const DEFAULT_CITY = 'New York';
 
 export const funnyWeatherLines = {
-  Clear: [
-    'The sun showed up and chose violence ☀️',
-    'Not a cloud in sight. Suspiciously optimistic.',
-    'Sunglasses weather. You deserve this.',
-    'The sky is flirting with you today.',
-    'Golden hour all day. Go outside, you goblin.',
-    'Plot twist: the weather is actually nice.',
-  ],
-  Clouds: [
-    'Cloudy with a chance of deep thoughts ☁️',
-    'Overcast and overthinking.',
-    'The sky is buffering.',
-    'Mood: grey but make it aesthetic.',
-    'Cloud coverage: 100%. Motivation: 0%.',
-    'Perfect weather for doing absolutely nothing.',
-  ],
-  Rain: [
-    'Your umbrella is in the trunk, isn\'t it?',
-    'A rainy stretch with quiet streets and silver skies.',
-    'Nature\'s way of saying stay home and binge something.',
-    'Dancing in the rain sounds fun until your socks get wet.',
-    'It\'s raining. Your hair didn\'t stand a chance.',
-    'Rain check on your plans. Literally.',
-  ],
-  Drizzle: [
-    'Barely rain. Like the sky changed its mind 💧',
-    'Sprinkle vibes only.',
-    'The sky is spitting. Rude.',
-    'Not enough to cancel plans. Unfortunately.',
-    'Is it raining? Technically.',
-  ],
-  Thunderstorm: [
-    'Thor is practicing again ⚡',
-    'Time to reenact dramatic movie scenes.',
-    'The sky is having a tantrum.',
-    'Perfect ambiance for an existential crisis.',
-    'Nature\'s surround sound system is ON.',
-    'Free light show, no tickets needed.',
-  ],
-  Snow: [
-    'Fluffy sky sadness ❄️',
-    'Snow excuse to stay inside.',
-    'Winter has entered the chat.',
-    'The world is a snow globe. You\'re the figurine.',
-    'Hot cocoa is now a medical necessity.',
-    'Snow day! Or as adults call it… a day.',
-  ],
-  Mist: [
-    'It\'s misty. So mysterious 🌫️',
-    'Where\'s the Sherlock theme?',
-    'Main character energy. Zero visibility.',
-    'The vibes are immaculate. The roads are not.',
-  ],
-  Fog: [
-    'Spooky air. Bring a flashlight.',
-    'Like walking through a dream.',
-    'Silent Hill weather. Stay close.',
-    'You can\'t see the future. Or the road.',
-  ],
-  Haze: [
-    'Feels like someone smeared the air.',
-    'Soft-filter life.',
-    'The sky got lazy with the render distance.',
-    'Everything looks like a 90s music video.',
-  ],
-  Smoke: [
-    'Air\'s got some extra seasoning 🔥',
-    'Smokey vibes. Not the fun kind.',
-    'The air is being dramatic today.',
-  ],
-  Dust: [
-    'It\'s exfoliation weather 💨',
-    'Free dermabrasion from Mother Nature.',
-    'Close your windows. And your mouth.',
-  ],
+  Clear: {
+    day: [
+      'The sun showed up and chose violence ☀️',
+      'Not a cloud in sight. Suspiciously optimistic.',
+      'Sunglasses weather. You deserve this.',
+      'The sky is flirting with you today.',
+      'Golden hour all day. Go outside, you goblin.',
+      'Plot twist: the weather is actually nice.',
+    ],
+    night: [
+      'The moon is doing the absolute most tonight 🌙',
+      'Stars are out. Go be poetic or something.',
+      'Clear night. Every star showed up to flex.',
+      'The sky went full screensaver mode.',
+      'No clouds. Just you and the void.',
+      'Stargazing weather. Phone down, eyes up.',
+    ],
+  },
+  Clouds: {
+    day: [
+      'Cloudy with a chance of deep thoughts ☁️',
+      'Overcast and overthinking.',
+      'The sky is buffering.',
+      'Mood: grey but make it aesthetic.',
+      'Cloud coverage: 100%. Motivation: 0%.',
+      'Perfect weather for doing absolutely nothing.',
+    ],
+    night: [
+      'Clouds blocking the stars. Rude.',
+      'The sky is wearing a blanket tonight ☁️',
+      'Overcast night. The moon called in sick.',
+      'Cloudy and cozy. Perfect excuse for bed.',
+      'The night sky got censored by clouds.',
+    ],
+  },
+  Rain: {
+    day: [
+      'Your umbrella is in the trunk, isn\'t it?',
+      'A rainy stretch with quiet streets and silver skies.',
+      'Nature\'s way of saying stay home and binge something.',
+      'Dancing in the rain sounds fun until your socks get wet.',
+      'It\'s raining. Your hair didn\'t stand a chance.',
+      'Rain check on your plans. Literally.',
+    ],
+    night: [
+      'Rain on the window. Main character sleeping hours 🌧️',
+      'Rainy night. Best sleep soundtrack ever.',
+      'The sky is crying. Go to bed.',
+      'Wet streets, glowing lights. Noir vibes.',
+      'Perfect night to fall asleep to rain.',
+    ],
+  },
+  Drizzle: {
+    day: [
+      'Barely rain. Like the sky changed its mind 💧',
+      'Sprinkle vibes only.',
+      'The sky is spitting. Rude.',
+      'Not enough to cancel plans. Unfortunately.',
+      'Is it raining? Technically.',
+    ],
+    night: [
+      'A light drizzle. The night is whispering 💧',
+      'Barely raining. The sky is being coy tonight.',
+      'Drizzle at night. Atmospheric.',
+    ],
+  },
+  Thunderstorm: {
+    day: [
+      'Thor is practicing again ⚡',
+      'Time to reenact dramatic movie scenes.',
+      'The sky is having a tantrum.',
+      'Perfect ambiance for an existential crisis.',
+      'Nature\'s surround sound system is ON.',
+      'Free light show, no tickets needed.',
+    ],
+    night: [
+      'Lightning and darkness. Horror movie vibes ⚡',
+      'The sky is throwing a rave and you weren\'t invited.',
+      'Thunder at night. Nature\'s alarm clock from hell.',
+      'Free light show outside your window.',
+      'The sky is screaming. Relatable.',
+    ],
+  },
+  Snow: {
+    day: [
+      'Fluffy sky sadness ❄️',
+      'Snow excuse to stay inside.',
+      'Winter has entered the chat.',
+      'The world is a snow globe. You\'re the figurine.',
+      'Hot cocoa is now a medical necessity.',
+      'Snow day! Or as adults call it… a day.',
+    ],
+    night: [
+      'Snow falling in the dark. Magical and freezing ❄️',
+      'Silent night. Literally. Snow muffled everything.',
+      'Winter wonderland after dark.',
+      'The snow glows under streetlights. Go look.',
+    ],
+  },
+  Mist: {
+    day: [
+      'It\'s misty. So mysterious 🌫️',
+      'Where\'s the Sherlock theme?',
+      'Main character energy. Zero visibility.',
+      'The vibes are immaculate. The roads are not.',
+    ],
+    night: [
+      'Misty night. Every streetlight is a movie scene 🌫️',
+      'Can\'t see anything. Spooky vibes activated.',
+      'The night is wearing a veil.',
+    ],
+  },
+  Fog: {
+    day: [
+      'Spooky air. Bring a flashlight.',
+      'Like walking through a dream.',
+      'Silent Hill weather. Stay close.',
+      'You can\'t see the future. Or the road.',
+    ],
+    night: [
+      'Foggy night. Horror soundtrack recommended.',
+      'The fog swallowed the streetlights.',
+      'Can\'t see three feet ahead. Classic.',
+    ],
+  },
+  Haze: {
+    day: [
+      'Feels like someone smeared the air.',
+      'Soft-filter life.',
+      'The sky got lazy with the render distance.',
+      'Everything looks like a 90s music video.',
+    ],
+    night: [
+      'Hazy night. The city glows weird.',
+      'Night haze. Everything has a filter on it.',
+    ],
+  },
+  Smoke: {
+    day: [
+      'Air\'s got some extra seasoning 🔥',
+      'Smokey vibes. Not the fun kind.',
+      'The air is being dramatic today.',
+    ],
+    night: [
+      'Smoky night. Close the windows.',
+      'The air smells like someone\'s bonfire regrets.',
+    ],
+  },
+  Dust: {
+    day: [
+      'It\'s exfoliation weather 💨',
+      'Free dermabrasion from Mother Nature.',
+      'Close your windows. And your mouth.',
+    ],
+    night: [
+      'Dusty night. Breathing is optional apparently.',
+      'Close the windows and pretend you\'re indoors.',
+    ],
+  },
+};
+
+export const profaneWeatherLines = {
+  Clear: {
+    day: [
+      'The sun woke up and said f*ck your plans, you\'re going outside ☀️',
+      'Stupidly gorgeous out. Almost offensive.',
+      'Zero clouds. God\'s showing off again.',
+      'It\'s so nice it\'s pissing me off.',
+      'The sky said "you\'re welcome, ungrateful b*tch."',
+      'Go outside you pasty hermit. The sun didn\'t show up for nothing.',
+    ],
+    night: [
+      'Clear sky tonight. The stars are flexing and they know it 🌙',
+      'The moon is out here looking smug as hell.',
+      'Not a damn cloud. The universe is being annoyingly pretty.',
+      'Stars said "look at us, losers." And honestly? Fair.',
+    ],
+  },
+  Clouds: {
+    day: [
+      'Overcast as hell. The sky is having a mid-life crisis ☁️',
+      'Cloudy. The sun called in sick, that lazy bastard.',
+      'Grey sky energy. Productivity is dead.',
+      'The sky looks like it gave up. Relatable.',
+      'Cloud coverage: 100%. Give-a-sh*t level: 0%.',
+    ],
+    night: [
+      'Cloudy night. Can\'t even see the damn moon.',
+      'Clouds said "no stars for you, b*tch" ☁️',
+      'Overcast darkness. Peak depression aesthetic.',
+      'The sky is being a little sh*t and hiding everything.',
+    ],
+  },
+  Rain: {
+    day: [
+      'It\'s pissing down. Your hair is f*cked.',
+      'Rain. Because the universe hates your outfit today.',
+      'Umbrella? At home. Naturally. God damn it.',
+      'Wet, cold, and miserable. Just like your ex.',
+      'The sky opened up and said "f*ck everyone outside."',
+    ],
+    night: [
+      'Raining at night. Go the f*ck to sleep 🌧️',
+      'Rainy night. Nature\'s white noise for your dumb*ss.',
+      'Streets are wet. Stay home you soggy disaster.',
+      'Rain on the window. Pretend you\'re in a sad movie.',
+    ],
+  },
+  Drizzle: {
+    day: [
+      'Can\'t even commit to raining properly. Pathetic 💧',
+      'Is it raining? Who the f*ck knows.',
+      'Half-ass rain. Even the sky is lazy today.',
+      'Drizzle. Just enough to ruin your hair, not enough for an umbrella.',
+    ],
+    night: [
+      'A sad little drizzle. The sky is crying but quietly 💧',
+      'Drizzling at night. Nature\'s passive-aggressive tears.',
+    ],
+  },
+  Thunderstorm: {
+    day: [
+      'Holy sh*t, the sky is ANGRY ⚡',
+      'Thunder so loud your ancestors flinched.',
+      'Nature said "and I took that personally."',
+      'The sky is throwing a goddamn tantrum.',
+      'Lightning round! And you\'re not winning.',
+    ],
+    night: [
+      'Thunder at night. Good f*cking luck sleeping ⚡',
+      'The sky is screaming into the void. Same tbh.',
+      'Lightning show at 2am. Thanks for nothing, sky.',
+      'Nature\'s rave. Uninvited. Loud as hell.',
+    ],
+  },
+  Snow: {
+    day: [
+      'It\'s snowing. Your commute is f*cked ❄️',
+      'Snow. Beautiful until you have to drive in it.',
+      'Winter wonderland my ass. It\'s freezing.',
+      'The sky is shedding. Someone get it a lint roller.',
+    ],
+    night: [
+      'Snow at night. Pretty as hell, cold as balls ❄️',
+      'Snowing in the dark. Magical until you step in it.',
+      'Silent snowy night. Peaceful until the shoveling.',
+    ],
+  },
+  Mist: {
+    day: [
+      'Misty as f*ck. Can\'t see sh*t 🌫️',
+      'The air is soup. Drive slow, you maniac.',
+      'Zero visibility. Just like your future.',
+    ],
+    night: [
+      'Misty night. Every alley looks like a murder scene 🌫️',
+      'Can\'t see a damn thing. Perfect.',
+    ],
+  },
+  Fog: {
+    day: [
+      'Foggy as hell. Silent Hill called, they want their weather back.',
+      'You can\'t see the road. Or your life choices.',
+    ],
+    night: [
+      'Foggy night. Creepy as f*ck.',
+      'The fog ate the streetlights. Lovely.',
+    ],
+  },
+  Haze: {
+    day: [
+      'Hazy garbage air. Your lungs send their regards.',
+      'The sky has a hangover. Same.',
+    ],
+    night: [
+      'Hazy night. The city looks drunk.',
+      'Night haze. Everything\'s got beer goggles.',
+    ],
+  },
+  Smoke: {
+    day: [
+      'The air tastes like regret and someone\'s BBQ 🔥',
+      'Smoky hell. Close every window.',
+    ],
+    night: [
+      'Smoky night. Breathing is a goddamn luxury.',
+    ],
+  },
+  Dust: {
+    day: [
+      'Dusty as hell. Free exfoliation whether you want it or not 💨',
+      'The air is crunchy. That can\'t be good.',
+    ],
+    night: [
+      'Dusty night. Your lungs are filing a complaint.',
+    ],
+  },
 };
 
 function normalizeCityList(cities) {
@@ -125,6 +347,7 @@ export default function useWeatherData() {
   const [darkMode, setDarkMode] = useState(false);
   const [theme, setTheme] = useState('default');
   const [alerts, setAlerts] = useState([]);
+  const [profanityMode, setProfanityMode] = useState(false);
   const debounceRef = useRef(null);
 
   // Theme persistence + body class
@@ -164,9 +387,20 @@ export default function useWeatherData() {
   }, []);
 
   useEffect(() => {
-    document.documentElement.classList.toggle('dark', darkMode && theme === 'default');
+    document.documentElement.classList.toggle('dark', darkMode);
     window.localStorage.setItem('tales-of-sky-dark', String(darkMode));
   }, [darkMode, theme]);
+
+  // Profanity mode persistence
+  useEffect(() => {
+    const stored = window.localStorage.getItem('tales-of-sky-profanity');
+    if (stored === 'true') setProfanityMode(true);
+  }, []);
+
+  const handleSetProfanityMode = useCallback((val) => {
+    setProfanityMode(val);
+    window.localStorage.setItem('tales-of-sky-profanity', String(val));
+  }, []);
 
   // Unit persistence
   useEffect(() => {
@@ -318,10 +552,19 @@ export default function useWeatherData() {
 
   const weatherCondition = weatherData?.weather?.[0]?.main;
 
+  const isDaytime = useMemo(() => {
+    if (!weatherData) return true;
+    const now = Date.now() / 1000;
+    return now > weatherData.sys.sunrise && now < weatherData.sys.sunset;
+  }, [weatherData]);
+
   const funnyLine = useMemo(() => {
-    const lines = funnyWeatherLines[weatherCondition];
-    return lines ? lines[Math.floor(Math.random() * lines.length)] : 'Weather is undecided.';
-  }, [weatherCondition]);
+    const source = profanityMode ? profaneWeatherLines : funnyWeatherLines;
+    const conditionLines = source[weatherCondition];
+    if (!conditionLines) return profanityMode ? 'Weather is f*cked. No data.' : 'Weather is undecided.';
+    const timeLines = isDaytime ? conditionLines.day : conditionLines.night;
+    return timeLines[Math.floor(Math.random() * timeLines.length)];
+  }, [weatherCondition, isDaytime, profanityMode]);
 
   const haiku = useMemo(() => {
     const lines = weatherHaikus[weatherCondition] || weatherHaikus['Clear'];
@@ -397,5 +640,6 @@ export default function useWeatherData() {
     funnyLine, haiku, weatherCondition, displayCities,
     fetchWeather, handleSearch, handleSuggestionClick,
     palette, hourlyData, dailyForecast, alerts,
+    profanityMode, handleSetProfanityMode,
   };
 }

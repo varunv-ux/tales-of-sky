@@ -21,6 +21,7 @@ export default function Home() {
     funnyLine, haiku, weatherCondition, displayCities,
     fetchWeather, handleSearch, handleSuggestionClick,
     palette, hourlyData, dailyForecast, alerts,
+    profanityMode, handleSetProfanityMode,
   } = useWeatherData();
 
   // Theme picker component
@@ -51,7 +52,7 @@ export default function Home() {
   const themeProps = {
     location, unit, weatherData, forecastData, isLoading, weatherCondition,
     handleSetUnit, toTemp, handleRefresh, funnyLine, haiku,
-    hourlyData, dailyForecast, palette, ThemePicker, alerts, darkMode, setDarkMode,
+    hourlyData, dailyForecast, palette, ThemePicker, alerts, darkMode, setDarkMode, profanityMode,
   };
 
   const isAurora = theme === 'aurora' && !isLoading;
@@ -130,6 +131,19 @@ export default function Home() {
                 </svg>
               )}
             </button>
+            {/* Profanity mode toggle */}
+            <button
+              onClick={() => handleSetProfanityMode(!profanityMode)}
+              aria-label="Toggle profanity mode"
+              title={profanityMode ? 'Profanity mode ON' : 'Profanity mode OFF'}
+              className={`px-2.5 py-1 rounded-full border text-[0.7rem] font-bold tracking-[-0.02em] transition-colors ${
+                profanityMode
+                  ? 'bg-red-600 dark:bg-red-500 text-white border-red-600 dark:border-red-500'
+                  : 'border-taupe-200 dark:border-taupe-700 text-taupe-400 dark:text-taupe-500 bg-white dark:bg-taupe-800 hover:bg-taupe-100 dark:hover:bg-taupe-700'
+              }`}
+            >
+              🤬
+            </button>
             {/* Unit toggle */}
             <div className="flex space-x-1.5">
               {['C', 'F'].map((u) => (
@@ -176,7 +190,7 @@ export default function Home() {
                   toTemp={toTemp}
                 />
                 <ConditionsPanel weatherData={weatherData} unit={unit} toTemp={toTemp} />
-                <WeatherInsights weatherData={weatherData} forecastData={forecastData} unit={unit} toTemp={toTemp} />
+                <WeatherInsights weatherData={weatherData} forecastData={forecastData} unit={unit} toTemp={toTemp} profanityMode={profanityMode} />
                 <HourlyForecast forecastData={forecastData} unit={unit} toTemp={toTemp} />
                 <DailyForecast forecastData={forecastData} unit={unit} toTemp={toTemp} />
 
