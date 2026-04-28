@@ -5,3 +5,10 @@ node_modules/
 node_modules
 .env.local
 .env*.local
+.vercel
+
+# Test/scratch assets
+public/weather-images/test-ghibli/
+public/weather-images/seattle-watercolor/
+public/weather-images/seattle/
+public/talesofsky-og.png
