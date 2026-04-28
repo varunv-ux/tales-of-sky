@@ -60,8 +60,8 @@ export default function AuroraTheme({
           style={{ background: `radial-gradient(circle, ${b3} 0%, transparent 70%)`, top: '45%', left: '40%', opacity: d ? 0.35 : 0.4 }} />
       </div>
 
-      {/* Top bar with controls */}
-      <div className="relative z-20 flex justify-end items-center gap-2 px-6 pt-5">
+      {/* Top bar with controls — hidden on mobile (uses mobile header menu) */}
+      <div className="relative z-20 hidden md:flex justify-end items-center gap-2 px-6 pt-5">
         <button onClick={handleRefresh}
           className={`p-1.5 rounded-full text-xs font-bold transition-all ${btnInactive} hover:opacity-80`}>
           ↻
